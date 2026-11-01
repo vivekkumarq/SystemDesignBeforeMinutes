@@ -53,12 +53,12 @@ sequenceDiagram
   participant App as Stream app
   participant In as Input topic
   participant Out as Output topic
-  participant Off as __consumer_offsets
-  App->>In: poll records 100–149
+  participant OT as Offsets topic
+  App->>In: poll records 100 to 149
   App->>App: process
-  App->>Out: beginTransaction, send results
-  App->>Off: sendOffsetsToTransaction (150)
-  App->>Out: commitTransaction (atomic: outputs + offsets)
+  App->>Out: begin transaction and send results
+  App->>OT: send offsets in transaction (150)
+  App->>Out: commit transaction, outputs and offsets together
 ```
 
 If the app crashes mid-transaction, the transaction aborts: outputs are discarded and offsets not advanced, so reprocessing produces the same result once. Kafka Streams enables this with one setting (`processing.guarantee=exactly_once_v2`).
