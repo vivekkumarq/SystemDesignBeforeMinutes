@@ -298,7 +298,7 @@
   // ---------- Search ----------
   const input = $('#search'), results = $('#searchResults');
   let index = null, sel = -1;
-  const plain = (md) => md.replace(/```(quiz|cards)[\s\S]*?```/g, ' ').replace(/```mermaid[\s\S]*?```/g, ' ').replace(/<[^>]+>/g, ' ').replace(/[#>*_`|\[\]()!-]+/g, ' ').replace(/\s+/g, ' ');
+  const plain = (md) => md.replace(/\]\([^)]*\)/g, ']').replace(/```(quiz|cards)[\s\S]*?```/g, ' ').replace(/```mermaid[\s\S]*?```/g, ' ').replace(/<[^>]+>/g, ' ').replace(/[#>*_`|\[\]()!-]+/g, ' ').replace(/\s+/g, ' ');
   function buildIndex() {
     index ??= Promise.all(LESSONS.map(async (l) => {
       const md = (await loadMd(l.id)) || '';
