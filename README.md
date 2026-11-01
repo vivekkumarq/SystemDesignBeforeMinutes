@@ -1,4 +1,5 @@
 # SystemDesignBeforeMinutes
+n**Live:** https://systemdesignbeforeminutes.duckdns.org
 
 A complete system design course written in plain language: fundamentals, databases, caching, CDNs, networking, API design, distributed systems, trade-offs, HLD and LLD case studies, design patterns and rapid revision.
 
