@@ -1,3 +1,6 @@
+
+> [!REAL] Booking on BookMyShow
+> Cities have cinemas, cinemas have screens, screens have shows, shows have seats. The hard part is two people tapping the same seat at once.
 ## Requirements
 
 - Cities have **cinemas**; cinemas have **screens** with a **seat layout** (rows, seat numbers, categories like REGULAR/PREMIUM/RECLINER).

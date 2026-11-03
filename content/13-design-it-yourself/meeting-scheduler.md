@@ -10,6 +10,9 @@ Design a **meeting scheduler** like the scheduling part of Google Calendar or Ou
 
 **Your turn:** 35 minutes on your canvas.
 
+> [!REAL] Think Google Calendar
+> "Find a 30-minute slot when all 8 of us are free next week" sounds simple, until people are in different time zones, have recurring meetings and two people try to book the same room at once.
+
 ## Hints
 
 <details>

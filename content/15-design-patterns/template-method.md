@@ -6,6 +6,9 @@
 
 Every data import follows the same steps: open the source, read records, validate, transform, save, report. Only some steps differ between CSV files, Excel sheets and a partner's API. Copy-pasting the whole flow into each importer duplicates the sequence, and a fix to the flow (say, adding an audit step) must be repeated everywhere.
 
+> [!REAL] Making any hot drink
+> Boil water, brew, pour, add extras. The steps are fixed; tea and coffee only differ in "brew" and "add extras". The parent class fixes the order; subclasses fill in the steps.
+
 ## Structure
 
 ```mermaid

@@ -22,6 +22,9 @@ class AcmePayClient {                     // vendor code
 
 You don't want vendor types leaking all over your code.
 
+> [!REAL] A travel plug adapter
+> Your Indian charger doesn't fit a UK socket. The adapter changes the shape without changing the charger or the wall. In code, an adapter makes an old or third-party API look like the interface you expect.
+
 ## Object adapter (composition): the usual choice
 
 ```mermaid

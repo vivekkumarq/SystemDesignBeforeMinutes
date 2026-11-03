@@ -1,3 +1,6 @@
+
+> [!REAL] The snack machine at the railway station
+> Insert coins, choose an item, get it and your change, or a refund if it's out of stock. What each button does depends on the machine's current state: a textbook State pattern.
 ## Requirements
 
 - The machine holds **products** in slots (code, price, quantity).

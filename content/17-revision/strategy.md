@@ -14,6 +14,9 @@ Knowledge gets you into the conversation. How you run the conversation decides t
 - **Scope out loud:** "I'll focus on posting and the feed; I'll leave out messaging and ads unless you'd like them."
 - **Write requirements down** where both of you can see them.
 
+> [!REAL] The opening overs
+> In cricket, the opening overs set up the innings. In an interview, the first five minutes of clarifying questions set up everything after them.
+
 ## While designing
 
 - **Think aloud continuously.** Silence can't be graded.

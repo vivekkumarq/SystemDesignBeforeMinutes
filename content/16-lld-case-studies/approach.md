@@ -22,6 +22,9 @@ A low-level design (LLD) or machine-coding round asks you to design classes, and
 ### 2. Identify entities (nouns) and behaviours (verbs)
 Read the requirements and underline nouns (ParkingLot, Floor, Spot, Vehicle, Ticket, Payment) and verbs (park, unpark, calculateFee, pay). Nouns usually become classes; verbs become methods on the class that owns the data needed.
 
+> [!REAL] Underline the nouns
+> "A **customer** **books** a **seat** for a **show**." Nouns become classes (Customer, Seat, Show, Booking); verbs become methods (`book()`). It's the same trick from school grammar.
+
 ### 3. Define relationships
 - **Composition** (owns, lifecycle tied): a `ParkingLot` has `Floor`s.
 - **Aggregation/association** (uses, independent): a `Ticket` refers to a `Vehicle`.
@@ -38,6 +41,9 @@ Anything with a lifecycle (ticket, order, elevator, machine) gets an enum or the
 
 ### 7. Handle concurrency
 Two entry gates allocating the same spot, two users booking the same seat: use thread-safe structures, atomic operations or locks around the critical section.
+
+> [!REAL] Two people grabbing the last samosa
+> Whenever two users can touch the same thing at once (a seat, a parking spot, a driver), say how you prevent both from getting it: a lock, an atomic compare-and-set or a database constraint.
 
 ### 8. Write code (machine coding)
 Start with models and interfaces, then the core service, then a small `main` or tests that exercise the main flows. Keep it compiling as you go.

@@ -1,5 +1,8 @@
 A teammate proposes the design below for a URL shortener expected to serve **20,000 redirects per second** with **99.99% availability**. Read it carefully and list every problem you can find **before** opening the review.
 
+> [!REAL] A link shared in every WhatsApp group
+> One election-result link can be clicked 100,000 times in a minute. A design that hits the database on every click, or has one server, falls over the first time something goes viral.
+
 ## The proposed design
 
 ```mermaid

@@ -14,6 +14,9 @@ Design a photo-sharing service like Instagram: users upload photos, follow other
 - Extremely read-heavy.
 - Global users; celebrity accounts with 100M+ followers.
 
+> [!REAL] Think Instagram
+> When Facebook bought Instagram in 2012, it had over 30 million users and about 13 employees, running on PostgreSQL, Redis and object storage. The basic shape (upload to object storage, metadata in a database, feeds from caches) still holds at much larger scale.
+
 ## 2. Estimates
 
 - 500M DAU; 100M photo uploads/day → ~1,200 uploads/s avg, ~3,500/s peak.
@@ -64,6 +67,9 @@ flowchart LR
 2. An upload event triggers workers that validate, strip metadata (EXIF location!), create resized versions (thumbnail, 320, 640, 1080 px) and modern formats (WebP/AVIF), and run moderation.
 3. The client then creates the post referencing the `mediaId`. Images are served via the CDN with long cache TTLs (immutable, versioned URLs).
 
+> [!REAL] Dropping the parcel at the warehouse
+> Your phone uploads the photo straight to object storage using a pre-signed URL, like dropping a parcel at the warehouse with a pre-paid slip. The app servers never have to carry the heavy bytes.
+
 ### Data model
 - **Posts:** `(user_id, post_id, media_keys, caption, created_at)`, sharded by `user_id` so a profile grid is a single-shard range query. Use time-sortable IDs (Snowflake-style) so sorting by ID sorts by time.
 - **Follow graph:** `followers(user_id → follower_ids)` and `following(user_id → followee_ids)`, both stored (denormalised) because both directions are queried. Wide-column or a graph-friendly store.
@@ -94,6 +100,9 @@ flowchart TB
   C --> M
 ```
 
+> [!REAL] Newspaper delivery vs going to the stall
+> Fan-out on write is delivering a copy of the newspaper to every subscriber's door as soon as it's printed. Fan-out on read is each reader walking to the stall when they want it. For a celebrity with 600 million followers, door-to-door delivery is impossible, so celebrity posts are fetched on read.
+
 ### Hydration and ranking
 Timelines hold **post IDs only**. The feed service fetches post details, author info, like counts and "liked by me" in batched multi-gets from caches, then ranks (recency, engagement, affinity with the author) if the feed is ranked. Paginate with a cursor.
 
@@ -101,6 +110,9 @@ Timelines hold **post IDs only**. The feed service fetches post details, author 
 A viral post can receive thousands of likes per second, so a single counter row is a hot spot.
 - Record the like `(post_id, user_id)` idempotently (unique per pair).
 - Increment a **sharded counter** (N sub-counters summed on read) or aggregate likes in a stream processor and update counts every few seconds. Exact real-time counts aren't required.
+
+> [!REAL] The tally counter at the gate
+> Instead of updating one number on every like, the system adds up likes in memory or in several counter shards and writes the total every few seconds. Nobody needs the exact like count to the millisecond.
 
 ### Caching
 - CDN for all images.

@@ -8,6 +8,9 @@ Reading designs builds recognition. Producing designs builds skill, and intervie
 4. **Reference design:** open it only after you've finished your own. Compare, don't copy.
 5. **Self-review checklist:** score yourself honestly.
 
+> [!REAL] Like a driving lesson
+> You don't learn to drive by watching videos. You drive, the instructor points out mistakes, and you drive again. Design first, compare second, then design again.
+
 ## The canvas template
 
 Divide your canvas into regions before you start. It keeps you on the method from [A Framework for Any Design Question](#/l/01-fundamentals/interview-framework).

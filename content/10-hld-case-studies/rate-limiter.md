@@ -13,6 +13,9 @@ Design a distributed rate limiter that protects a fleet of API servers: limit ea
 - Highly available: the limiter failing must not take down the API.
 - Scales to millions of clients and hundreds of thousands of requests per second.
 
+> [!REAL] OTP and login limits
+> "Too many OTP requests, try after 30 minutes" is a rate limiter. Without it, an attacker could trigger thousands of paid SMSs or try every 4-digit PIN.
+
 ## 2. Estimates
 
 - 500K requests/s across the API fleet; 10M distinct client keys per day.
@@ -29,6 +32,9 @@ Design a distributed rate limiter that protects a fleet of API servers: limit ea
 | Inside each service | Business-specific quotas | Duplicated logic |
 
 Typical design: coarse per-IP limits at the edge, per-user/key limits at the gateway, and business quotas in services. We'll design the gateway limiter.
+
+> [!REAL] The guard at the gate vs inside every flat
+> Rate limiting at the API gateway is the society guard stopping a flood of visitors at the gate. Limiting inside each service is every flat checking for itself: more precise, but slower to set up everywhere.
 
 ## 4. Algorithm
 
@@ -57,6 +63,9 @@ flowchart LR
 
 ### Atomicity
 A naive `GET` then `SET` from two gateways races and lets extra requests through. A Lua script runs atomically in Redis, so refill-check-decrement is one step. Keys auto-expire when idle (`PEXPIRE`), so inactive clients cost no memory.
+
+> [!REAL] Two clerks, one counter
+> If two servers both read "9 of 10 used" and both allow a request, the user gets 11. A Redis Lua script or `INCR` makes "check and add" a single step so that can't happen.
 
 ### Rules configuration
 
@@ -87,6 +96,9 @@ If Redis is unreachable or slow (check with a tight timeout, e.g. 5 ms):
 - **Fail closed** for highly sensitive endpoints (e.g. OTP sending), protecting downstream at the cost of availability.
 - Circuit-break Redis calls so a degraded Redis doesn't add latency to every request.
 
+> [!REAL] If the guard is missing, open or shut the gate?
+> If Redis is down, do you allow everyone (fail open) or block everyone (fail closed)? Most products fail open for normal APIs and fail closed for sensitive ones like login attempts.
+
 ### Multi-region
 Options: independent limits per region (simple; a client could get N× limit across regions), or a global budget split across regions with periodic rebalancing. Most APIs accept per-region limits.
 
@@ -100,6 +112,9 @@ Use Redis server time (inside the script) rather than gateway clocks to avoid sk
 
 ### Client experience
 Return clear headers, document limits, and encourage exponential backoff with jitter on 429.
+
+> [!REAL] "Try again in 30 seconds"
+> A good limiter returns HTTP 429 with a `Retry-After` header, so well-behaved apps wait the right amount of time instead of hammering the server.
 
 ## 7. Trade-offs
 

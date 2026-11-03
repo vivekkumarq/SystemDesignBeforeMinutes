@@ -18,6 +18,9 @@ double fare(Trip t) {
 
 Pricing rules change often (surge, festivals, subscriptions), and the `switch` grows and gets duplicated.
 
+> [!REAL] Choosing a route in Google Maps
+> Fastest, shortest, avoid tolls: same journey, different algorithm. Strategy lets you swap the algorithm (pricing, sorting, routing) without changing the code that uses it.
+
 ## The strategy
 
 ```mermaid

@@ -14,6 +14,9 @@ Design a swipe-based dating app like Tinder: users see a stack of nearby profile
 - Scale: tens of millions of daily users, billions of swipes per day.
 - Location changes as users travel.
 
+> [!REAL] Think Tinder or Bumble
+> Tinder has reported processing billions of swipes a day. The core loop is: show candidates nearby, record swipes very fast, and detect a match when two people both swipe right.
+
 ## 2. Estimates
 
 - 50M DAU, ~100 swipes each per day → **5B swipes/day ≈ 60K swipes/s** average, ~150K/s peak.
@@ -70,6 +73,9 @@ A user may have swiped on tens of thousands of profiles. Options:
 - Keep a **per-user Bloom filter** of swiped IDs in memory: very compact, with rare false positives (occasionally skipping a profile you hadn't seen, which is harmless). See [Bloom Filter vs Hash Table](#/l/09-tradeoffs/bloom-vs-hashtable).
 - Filter the precomputed stack against the Bloom filter before serving.
 
+> [!REAL] A "seen" stamp
+> Each user has a record of profiles already shown. A Bloom filter per user can cheaply answer "definitely not seen", so the deck stays fresh.
+
 ### Recording swipes at 150K/s
 - Writes go to a **wide-column store** (Cassandra/ScyllaDB) partitioned by swiper ID: `(swiper_id, target_id) → direction, ts`. Append-heavy, simple key access: a perfect fit.
 - The app can batch swipes and send them in groups to reduce request overhead.
@@ -96,6 +102,9 @@ sequenceDiagram
   M->>M: insert match (unique on pair)
   M-->>A: It's a match!
 ```
+
+> [!REAL] Two keys to open the locker
+> A match is a locker that needs both keys. When B swipes right on A, check whether A already swiped right on B. If yes, it's a match and both get notified.
 
 ### Location updates
 Users move. Update location on app open and periodically (not continuously, to save battery), and re-index. Invalidate the precomputed stack when the user moves far enough.

@@ -1,5 +1,8 @@
 Here is a proposed design for a video platform with **10 million daily viewers worldwide** and creators uploading files of up to 4 GB. Find the problems before opening the review.
 
+> [!REAL] Uploading a 4 GB wedding video
+> Think of a creator uploading a 4 GB file on hotel Wi-Fi, and a viewer in Chennai watching from a server in the US. Every flaw below hurts one of those two people.
+
 ## The proposed design
 
 ```mermaid

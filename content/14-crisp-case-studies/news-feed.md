@@ -1,5 +1,8 @@
 **In one line:** when you open the app, the system gathers a few thousand recent candidate posts from your friends, pages and groups (mostly from precomputed or cached sources), scores each with machine-learned predictions of what you'll engage with, and returns the top results, all in a few hundred milliseconds.
 
+> [!REAL] A personal newspaper editor
+> Out of thousands of possible stories, an editor picks the 20 you're most likely to read, in order. The ranking funnel is that editor, working in milliseconds.
+
 ## The ranking funnel
 
 ```mermaid

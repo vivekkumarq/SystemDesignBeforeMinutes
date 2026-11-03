@@ -1,5 +1,8 @@
 **In one line:** real-time media travels over UDP, where a late packet is simply skipped rather than retransmitted; the system adds a little redundancy, adapts the video quality to the network, smooths jitter with a short buffer, and routes media through nearby servers that forward (not re-encode) each stream.
 
+> [!REAL] Live TV vs a recorded show
+> On a live call, a word that arrives late is useless, so it's skipped. That's why Zoom uses UDP and accepts tiny glitches rather than freezing to wait for lost data.
+
 ## Why not TCP?
 
 TCP retransmits every lost packet and holds everything after it until the gap is filled. For a live call, a packet that arrives 300 ms late is useless: the moment has passed. So calls use UDP and handle loss smartly instead.

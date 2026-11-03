@@ -16,6 +16,9 @@ Design a chat app like WhatsApp: one-to-one and group messaging, delivered in re
 - Scale: 2B users, 100B messages/day.
 - Privacy: end-to-end encryption (the server can't read messages).
 
+> [!REAL] Think WhatsApp
+> WhatsApp handles over 100 billion messages a day and became famous for running a huge user base with a very small engineering team on Erlang servers holding millions of connections each. Keep that picture in mind: long-lived connections, store-and-forward, and ticks for sent, delivered and read.
+
 ## 2. Estimates
 
 - 100B messages/day → ~1.2M messages/s average, ~3M/s peak.
@@ -44,6 +47,9 @@ flowchart LR
 - Gateways are thin: they hold connections and forward frames. Business logic lives in stateless message services.
 - Heartbeats detect dead connections; clients reconnect with exponential backoff and resume.
 
+> [!REAL] A dedicated phone line per user
+> Every online phone keeps one open connection (WebSocket or a custom TCP protocol) to a chat server, like a telephone line that stays off the hook. The server can push a message the instant it arrives instead of waiting for the phone to ask.
+
 ### Sending a message
 1. A's app assigns a **client message ID** (for idempotent retries) and sends it over its connection.
 2. The message service assigns a **per-conversation sequence number** (defines order), stores the message durably, and **acks** A → one tick ✓.
@@ -70,12 +76,18 @@ sequenceDiagram
 ### Offline sync
 On reconnect, each device tells the server the last sequence it has per conversation (or a global per-device cursor); the server sends everything newer from the undelivered queue/message store, in order, in batches. After the device acks, the queue entries can be deleted.
 
+> [!REAL] The post office holding your letters
+> When you're on a flight, messages wait in the post office (the server's inbox). The moment you land and switch on data, the backlog is delivered and the sender's single grey tick turns into two.
+
 ## 4. Deep dives
 
 ### Ordering
 - A single global order is unnecessary and expensive. Order **per conversation** with a monotonically increasing sequence.
 - Generate it in the partition that owns the conversation (e.g. Redis `INCR` per conversation, or the store's partition leader), so it's a local operation.
 - Clients sort by sequence and detect gaps (missing seq 41 → fetch it).
+
+> [!REAL] Numbered pages of a letter
+> If you send a long letter in three envelopes, you number them 1/3, 2/3, 3/3 so the reader can put them in order. Each conversation gets increasing sequence numbers for the same reason.
 
 ### Exactly-once (effectively)
 Mobile clients retry over flaky networks. The client message ID makes sends idempotent: the server dedups `(sender, clientMsgId)` and returns the original sequence.
@@ -94,11 +106,17 @@ Mobile clients retry over flaky networks. The client message ID makes sends idem
 - Online status = has an active connection; "last seen" = time of last disconnect/heartbeat.
 - Presence changes are frequent; don't broadcast every change to every contact. Publish to contacts who currently have the chat open or subscribe on demand, throttle updates, and store last-seen with a TTL.
 
+> [!REAL] The "online" dot
+> "Online" and "last seen" are approximate on purpose: the app sends a heartbeat every so often and the server marks you offline after a few missed beats. Being exact would cost a huge number of writes for little value.
+
 ### Push notifications
 For backgrounded apps, the push service sends via APNs/FCM. With end-to-end encryption, the notification carries an encrypted payload or just a "new message" signal, and the app fetches and decrypts.
 
 ### End-to-end encryption
 Clients exchange keys (e.g. the Signal protocol: identity keys, signed pre-keys, one-time pre-keys uploaded to the server); messages are encrypted on the sender's device for each recipient device. The server routes ciphertext it cannot read. Group chats use sender keys to avoid encrypting per member each time. Consequence: server-side search and moderation of content aren't possible.
+
+> [!REAL] A locked box the post office can't open
+> With the Signal protocol used by WhatsApp, the server only ever carries locked boxes. It can deliver them but can't read them, which is also why server-side search of your messages isn't possible.
 
 ### Media
 Upload encrypted media to object storage (pre-signed URL), send a message containing the media reference and key; recipients download via CDN and decrypt.

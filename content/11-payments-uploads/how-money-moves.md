@@ -11,6 +11,9 @@ Before designing a payment system, you need a mental model of what actually happ
 | **Card network** | Visa, Mastercard, RuPay: routes messages and money between banks, sets rules |
 | **Issuer (customer's bank)** | Issued the card; approves or declines; debits the customer |
 
+> [!REAL] Five people at the table
+> You (cardholder), the shop (merchant), the shop's bank (acquirer), your bank (issuer) and the network in the middle (Visa, Mastercard or RuPay). Each has a role in every ₹100 swipe.
+
 ## Phase 1: authorisation (seconds)
 
 ```mermaid
@@ -37,6 +40,9 @@ sequenceDiagram
 - The issuer checks the balance or credit limit and fraud rules, possibly asking the customer to verify (3-D Secure / OTP).
 - If approved, the issuer **places a hold** on the funds. **No money has moved yet.**
 
+> [!REAL] "Is there enough money?"
+> When you tap your card at a petrol pump, your bank checks your balance and fraud signals and puts a hold on the amount. Nothing has moved yet; the money is only reserved.
+
 ## Phase 2: capture
 
 The merchant tells the gateway to **capture** the authorised amount, typically when the order ships (e-commerce) or immediately (digital goods).
@@ -49,6 +55,9 @@ The merchant tells the gateway to **capture** the authorised amount, typically w
 - At the end of the day, captured transactions are sent in batches through the network (**clearing**).
 - The issuer pays the network, the network pays the acquirer (**settlement**), and the acquirer credits the merchant's account, **minus fees** (interchange to the issuer, network fees, acquirer/gateway margin).
 - The merchant receives a **payout**, often aggregated over many payments, days later.
+
+> [!REAL] The money actually moves
+> At night, the banks settle up with each other in bulk. The shopkeeper sees the money in his account a day or two later, minus the fees.
 
 ## After the payment
 
@@ -63,9 +72,15 @@ Systems such as India's UPI move money directly between bank accounts in seconds
 - Interbank settlement still happens in batches between banks behind the scenes, but the customer sees money move instantly.
 - Status can be **pending/unknown** when a bank times out. Apps must query status and reconcile rather than assume failure, which is a classic source of "money debited but payment failed" complaints, resolved by automatic reversal.
 
+> [!REAL] UPI in 2 seconds
+> With UPI, you scan the QR code, enter your PIN, and NPCI routes the request from your bank to the shopkeeper's bank, which credits them in seconds. UPI now handles well over ten billion transactions a month.
+
 ## Wallets and stored balances
 
 A wallet is a ledger the company keeps: top-ups move real money into the company's pooled bank account, and transfers between users are just ledger entries inside the company's system. That's why wallet-to-wallet transfers are instant: no bank is involved until someone withdraws.
+
+> [!REAL] The Paytm wallet
+> Money added to a wallet sits with the wallet company. Paying from it is just moving numbers between two accounts in their own ledger, which is why it feels instant.
 
 ## What this means for system design
 

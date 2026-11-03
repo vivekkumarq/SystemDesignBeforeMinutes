@@ -6,6 +6,9 @@
 
 A map app renders 1,000,000 trees. Each tree object stores its position plus its type data: species name, colour, a 200 KB texture and a 3D mesh. A million copies of the texture and mesh would need hundreds of gigabytes, while there are only 20 tree species.
 
+> [!REAL] Trees in a video game forest
+> A game forest has 100,000 trees, but only 5 tree models. Each tree stores only its position (extrinsic), sharing the heavy model and texture (intrinsic).
+
 ## Intrinsic vs extrinsic state
 
 - **Intrinsic state:** shared, identical across many objects, and **immutable** (species name, texture, mesh). Stored once, in the flyweight.

@@ -24,6 +24,9 @@ stateDiagram-v2
   REFUNDED --> [*]
 ```
 
+> [!REAL] The courier tracking page
+> "Ordered → Packed → Shipped → Delivered". A parcel can't go from "Delivered" back to "Packed". A payment can't go from "Refunded" back to "Captured". The state machine forbids the impossible moves.
+
 ### Implementation rules
 1. **Store the state** in the payments table with a version column.
 2. **Allow only defined transitions.** Reject `FAILED → CAPTURED`.
@@ -93,6 +96,9 @@ Details that matter:
 - Store the **final response** and return it verbatim to retries.
 - Keep keys for a retention window (24 h – 30 days).
 - Scope keys per merchant/user.
+
+> [!REAL] The receipt number at the counter
+> If you're not sure your form was submitted, you show the clerk your receipt number and he tells you its status instead of filing it again.
 
 ### Idempotency all the way down
 Your service being idempotent isn't enough if it calls a gateway that isn't:

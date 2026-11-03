@@ -55,6 +55,9 @@ flowchart LR
 - **Cascade:** try the cheap model first; escalate if output fails validation or confidence checks.
 - **Specialisation:** different models for embedding, re-ranking, extraction and generation.
 
+> [!REAL] Junior doctor first, specialist if needed
+> A clinic's junior doctor handles colds and routine cases; complex ones go to the specialist. A small, cheap model handles easy requests and escalates hard ones to the large model.
+
 ## Serving self-hosted models
 
 - **Inference servers** batch requests dynamically on GPUs to raise throughput (continuous batching), manage the key–value cache for long contexts, and stream tokens.
@@ -73,6 +76,9 @@ flowchart LR
 | New facts every day | RAG, not fine-tuning (retraining is slow) |
 
 Try them in that order of effort: better prompts → RAG → fine-tuning.
+
+> [!REAL] Instructions, a reference book or training
+> Prompting is giving a new employee clear instructions. RAG is handing them the company handbook to look things up. Fine-tuning is sending them on a training course. Try them in that order.
 
 ## Measuring in production
 

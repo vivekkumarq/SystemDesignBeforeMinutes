@@ -14,6 +14,9 @@ Adding an LLM to a product changes the architecture in ways that catch tradition
 | Versioning | Code versions | Code + prompt + model version + retrieval index version |
 | Observability | Metrics, logs, traces | Plus token usage, cost, quality scores, user feedback |
 
+> [!REAL] A calculator vs an expert consultant
+> A calculator always gives the same answer instantly and for free. A consultant is slower, costs per hour, can phrase the same advice differently each time and is occasionally wrong. LLM features are the consultant, so you design for that.
+
 ## A reference architecture
 
 ```mermaid
@@ -52,6 +55,9 @@ flowchart LR
 - **Cache:** exact-match cache for repeated prompts; **semantic cache** for similar questions (careful with personalised or time-sensitive answers); **prompt caching** of long shared prefixes where providers support it.
 - **Async** for long tasks: accept the job, process in the background, notify when done.
 
+> [!REAL] Streaming like a live commentator
+> ChatGPT-style apps show words as they're generated, like a commentator speaking ball by ball, instead of making you wait for the whole report.
+
 ### Reliability
 - Timeouts and retries with backoff on provider calls; **fallback models** or providers.
 - **Graceful degradation:** if generation fails, return search results without a summary.
@@ -61,6 +67,9 @@ flowchart LR
 - Token budgets per request and per user; trim context to what's relevant.
 - Route by difficulty; batch offline workloads.
 - Track cost per feature and per tenant like any other resource.
+
+> [!REAL] The taxi meter is always running
+> Every token costs money. Sending a 50-page document to the model for every question is like taking a taxi to the next street: retrieve only the relevant pages.
 
 ### Quality and safety
 - **Ground** answers in retrieved sources and show citations.

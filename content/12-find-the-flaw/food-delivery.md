@@ -1,5 +1,8 @@
 A team designs a food-delivery platform: customers order from restaurants, restaurants accept, a delivery partner is assigned and tracked live. Expected peak: **dinner rush, 20,000 orders per minute** across many cities. Find the problems.
 
+> [!REAL] Dinner rush at 8 p.m.
+> At 8 p.m. on a Friday, Swiggy and Zomato see their sharpest spike: orders, restaurant updates and rider pings all jump at once. Ask of every box below: what happens to it at 8 p.m.?
+
 ## The proposed design
 
 ```mermaid

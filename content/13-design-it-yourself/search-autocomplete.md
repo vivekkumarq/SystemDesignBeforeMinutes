@@ -9,6 +9,9 @@ Design **search autocomplete** (typeahead) for a large search engine or e-commer
 
 **Your turn:** 35 minutes on your canvas.
 
+> [!REAL] Think Google's search box
+> Type "how to m" and suggestions like "how to make tea" appear before you finish. That has to happen in under ~100 ms for every keystroke, for millions of people.
+
 ## Hints
 
 <details>

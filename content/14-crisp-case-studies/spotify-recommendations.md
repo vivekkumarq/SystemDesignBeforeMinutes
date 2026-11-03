@@ -1,5 +1,8 @@
 **In one line:** heavy machine learning runs offline to learn compact "taste vectors" for users and tracks; at request time the system quickly retrieves candidate tracks near your vector, ranks them with fresh signals from what you're doing right now, and serves the result from cache.
 
+> [!REAL] A music-shop owner who knows your taste
+> Over time the owner learns what you like (offline learning). When you walk in, he quickly pulls a few records you'll probably enjoy today (online serving).
+
 ## Two speeds: offline learning, online serving
 
 ```mermaid

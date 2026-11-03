@@ -13,6 +13,9 @@ Design a distributed in-memory cache like Redis Cluster or Memcached: a key-valu
 - High availability: a node failure shouldn't cause an outage (some cache misses are acceptable).
 - Consistency: eventual is acceptable for a cache, but clients shouldn't see wildly stale data.
 
+> [!REAL] Think Redis Cluster or Memcached at Facebook
+> Facebook described running Memcached across thousands of servers to serve billions of reads per second in front of MySQL. A distributed cache is a giant shared memory, split across many machines.
+
 ## 2. Estimates
 
 - 10M ops/s at peak; 1 TB of hot data.
@@ -30,6 +33,9 @@ Design a distributed in-memory cache like Redis Cluster or Memcached: a key-valu
 
 ### Partitioning
 Use **consistent hashing with virtual nodes**, or a fixed set of **hash slots** (Redis Cluster uses 16,384 slots assigned to nodes). Adding a node moves only some slots/arcs, not all keys. See [From Modulo to Consistent Hashing](#/l/03-databases/consistent-hashing).
+
+> [!REAL] Lockers across many rooms
+> Keys are spread across nodes by hashing, the way lockers are spread across many rooms by number. Consistent hashing means adding a room only moves a few lockers.
 
 ### Routing: who knows where a key lives?
 
@@ -63,6 +69,9 @@ Move slots one at a time: copy keys for the slot to the new node while the old o
 
 ### Hot keys
 One key on one node can saturate it. Mitigations: client-side local caching with short TTL for the hottest keys, replicating hot keys under several names (`key#1..#N`) and reading one randomly, and reading from replicas. Detect hot keys with sampling.
+
+> [!REAL] Everyone wants the same locker
+> During a big sale, one product key may get more reads than one node can handle. Keep copies on several nodes or a short-lived copy in each app server's memory.
 
 ### Persistence (optional)
 A pure cache can start empty after a restart, but warm restarts help avoid stampedes on the database:

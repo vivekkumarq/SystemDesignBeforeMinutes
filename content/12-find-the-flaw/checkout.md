@@ -1,5 +1,8 @@
 Here is a proposed checkout flow for an online store that runs flash sales with **50,000 buyers competing for 1,000 units**. Find the problems before opening the review.
 
+> [!REAL] The Diwali sale counter
+> Picture 50,000 shoppers at a store with 1,000 TVs and one clerk checking stock in a paper register. Two clerks can both read "1 left" and sell it twice. The flaws below are exactly that, in software.
+
 ## The proposed design
 
 ```mermaid

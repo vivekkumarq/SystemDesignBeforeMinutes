@@ -1,5 +1,8 @@
 **In one line:** every payment attempt carries a unique idempotency key, a timed-out payment is treated as "unknown" rather than failed and resolved by asking the payment provider, and a state machine plus reconciliation guarantees the customer is charged exactly once.
 
+> [!REAL] "Did my payment go through?"
+> When the network drops right after you tap Pay, you don't tap again blindly; you check your bank SMS. The payment system does the same: it asks the provider for the status before doing anything else.
+
 ## When the network drops mid-payment
 
 ```mermaid

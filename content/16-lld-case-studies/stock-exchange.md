@@ -1,3 +1,6 @@
+
+> [!REAL] Buying shares on Zerodha
+> Your "buy 10 at ₹500" order sits in an order book until a seller at ₹500 or less appears. Best price first, then earliest order first: price-time priority.
 ## Requirements
 
 - Traders submit **orders** for a symbol: BUY or SELL, **LIMIT** (with a price) or **MARKET** (best available).

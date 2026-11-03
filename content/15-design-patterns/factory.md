@@ -13,6 +13,9 @@ else if (channel.equals("PUSH")) n = new PushNotification(fcm);
 
 This `if/else` gets copied wherever notifications are created, and every new channel means editing all of them.
 
+> [!REAL] Ordering a pizza
+> You ask for "a large Margherita"; you don't go into the kitchen and assemble it. A factory gives you the right object without you knowing which class it is or how it's made.
+
 ## 1. Simple Factory
 
 One class (or static method) holds the creation logic.
@@ -106,6 +109,9 @@ Another real example: a `PaymentProviderFactory` that creates the matching `Auth
 
 - **Pros:** guarantees consistent families; swap the whole family in one place.
 - **Cons:** adding a **new kind** of product (e.g. `Slider`) changes every factory.
+
+> [!REAL] Furniture sets
+> An IKEA "modern" range gives you a matching chair, table and sofa. An abstract factory creates a whole family of objects that belong together, such as all light-theme or all dark-theme UI widgets.
 
 ## Comparison
 

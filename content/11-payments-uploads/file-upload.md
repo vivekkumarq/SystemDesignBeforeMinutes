@@ -15,6 +15,9 @@ Design a system that lets users upload files, from small images to multi-gigabyt
 - Durable: once confirmed, never lost.
 - Secure: no unauthorised uploads, no malicious files served.
 
+> [!REAL] Think Google Drive or WeTransfer
+> Users upload files from a few KB to tens of GB, over unreliable mobile networks, and expect a failed upload to resume rather than start again.
+
 ## 2. The naive approach and why it fails
 
 Client → app server → object storage, streaming the whole file through the app:
@@ -22,6 +25,9 @@ Client → app server → object storage, streaming the whole file through the a
 - Long uploads tie up connections and threads; a server restart kills them.
 - A dropped connection at 95% means starting over.
 - Request size and timeout limits on load balancers break large uploads.
+
+> [!REAL] Carrying a sofa through the reception
+> Sending a 5 GB file through your API servers is like carrying a sofa through the office reception: it blocks the door for everyone else. Send big files to object storage directly.
 
 ## 3. The design: direct, chunked, resumable
 
@@ -52,6 +58,9 @@ App servers only exchange small JSON messages; the bytes go straight to the stor
 
 ### Resumability
 If the connection drops, the client asks the service (or storage) which parts are already uploaded and re-sends only the missing ones. Parts are independent, so failure costs at most one chunk. For browsers, the upload state can be saved in local storage so a page reload can resume. The open **tus** protocol standardises resumable uploads if you want a ready-made approach.
+
+> [!REAL] Bookmarking a long download
+> If your Wi-Fi drops at 80% of a 2 GB upload, chunked uploads restart at chunk 81 instead of from zero. S3 multipart upload and Google Drive's resumable upload work like this.
 
 ### Chunk size
 Too small → too many requests and overhead; too large → expensive retries on flaky networks. 5–16 MB is a common middle ground; adapt to network quality on mobile.
@@ -94,6 +103,9 @@ Queue-driven workers (idempotent, retryable): generate thumbnails/previews, tran
 
 ### Deduplication (optional)
 If the same file is uploaded many times (popular attachments), store content by hash (content-addressed storage) and keep per-user references. Be careful: hash checks before upload can leak whether a file exists, so do it server-side after upload or only within one user's own files.
+
+> [!REAL] The same forwarded video
+> The same viral video is uploaded by thousands of people. Store it once (keyed by its hash) and point every user's file entry at it.
 
 ### Speed for global users
 - Upload to a **nearby region or edge** (accelerated upload endpoints), then replicate to the home region.

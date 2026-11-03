@@ -1,5 +1,8 @@
 **In one line:** when you pick seats, they're **temporarily locked** for you for a few minutes with an atomic, all-or-nothing operation; the lock either turns into a booking when payment succeeds or expires automatically, so two people can never pay for the same seat.
 
+> [!REAL] Holding seats with your jacket
+> At a crowded cinema you drape your jacket over two seats while your friend buys popcorn. If they don't come back in a few minutes, the jacket comes off and the seats are free again. That's a seat hold with a timeout.
+
 ## The seat lifecycle
 
 ```mermaid

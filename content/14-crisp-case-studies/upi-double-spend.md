@@ -1,5 +1,8 @@
 **In one line:** every transaction has a globally unique ID that every party (app, payment switch, banks) uses to deduplicate; the payer's bank debits atomically with a balance check; and when a response is lost, the system **checks status** and reverses automatically instead of retrying blindly, so the same money can't be spent twice.
 
+> [!REAL] The same cheque can't be cleared twice
+> Every UPI payment carries a unique transaction ID, like a cheque number. Present the same one twice and the bank recognises it and refuses to debit you again.
+
 ## The parties
 
 ```mermaid

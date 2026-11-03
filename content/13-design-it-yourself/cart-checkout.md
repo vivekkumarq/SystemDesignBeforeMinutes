@@ -9,6 +9,9 @@ Design the **shopping cart and checkout** for a large e-commerce site:
 
 **Your turn:** 35 minutes on your canvas.
 
+> [!REAL] Think Amazon or Flipkart
+> You add a phone to your cart on your laptop, open the app on your phone later and it's still there. At checkout, the price is re-checked and stock is held for a few minutes while you pay.
+
 ## Hints
 
 <details>

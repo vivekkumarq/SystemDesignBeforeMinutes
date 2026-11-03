@@ -1,3 +1,6 @@
+
+> [!REAL] The lift in your office building
+> A lift going up keeps stopping at floors on its way up before turning around, like a bus finishing its route. That's the SCAN algorithm, and it's why the lift doesn't zig-zag between floors.
 ## Requirements
 
 - A building has **N floors** and **M elevators**.

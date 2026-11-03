@@ -1,5 +1,8 @@
 A team proposes this design for a real-time collaborative editor. Up to **50 people** may edit a document at once. Find the problems before opening the review.
 
+> [!REAL] Emailing the whole Word file back and forth
+> Imagine 50 people each saving the full document every two seconds: whoever saves last wipes out everyone else's sentences. Watch for that "last save wins" smell in the design below.
+
 ## The proposed design
 
 ```mermaid

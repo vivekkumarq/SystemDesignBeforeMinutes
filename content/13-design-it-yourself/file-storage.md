@@ -10,6 +10,9 @@ Design a **cloud file storage and sync** service like Dropbox or Google Drive:
 
 **Your turn:** 35 minutes on your canvas.
 
+> [!REAL] Think Google Drive or Dropbox
+> You save a file on your office laptop and it appears on your home laptop a few seconds later. Edit a 1 GB file slightly, and only the changed part is uploaded again.
+
 ## Hints
 
 <details>

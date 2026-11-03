@@ -21,6 +21,9 @@ Four reasons to change: tax rules, schema, PDF layout, email provider. A change 
 
 **Smell:** class names with "And"/"Manager"/"Util", or methods that touch unrelated dependencies.
 
+> [!REAL] The Swiss army knife problem
+> A Swiss army knife is handy, but if the scissors break you send the whole knife for repair. A class that does billing, emailing and PDF generation breaks for three different reasons.
+
 ## O: Open/Closed Principle
 
 > Open for extension, closed for modification.
@@ -47,6 +50,9 @@ class EmployeeDiscount implements DiscountPolicy { public double discount(double
 
 **Smell:** growing `if/else` or `switch` on a type field in several places.
 
+> [!REAL] Phone cases and plug-in chargers
+> You add a new charger by plugging it into the socket; you don't rewire the wall. New payment methods should plug in as new classes, not as new `if` branches in old code.
+
 ## L: Liskov Substitution Principle
 
 > Subtypes must be usable anywhere their base type is expected, without surprises.
@@ -56,6 +62,9 @@ class EmployeeDiscount implements DiscountPolicy { public double discount(double
 **Fix:** don't inherit when the subtype can't honour the parent's contract. Model `Shape` with `area()`, and make `Square` and `Rectangle` separate implementations; or split interfaces (`ReadableList` vs `MutableList`).
 
 **Smell:** overrides that throw `UnsupportedOperationException`, or callers checking `instanceof` before using a base type.
+
+> [!REAL] A toy duck that needs batteries
+> If it looks like a duck but needs batteries, it's not a drop-in duck. Any subclass must work wherever the parent is expected, with no surprises.
 
 ## I: Interface Segregation Principle
 
@@ -75,6 +84,9 @@ class Robot implements Worker {
 **Fix:** small, role-based interfaces: `Workable`, `Eater`, `MeetingAttendee`. Classes implement only what they support.
 
 **Smell:** "fat" interfaces with many unrelated methods; empty or throwing implementations.
+
+> [!REAL] The TV remote with 60 buttons
+> Most people use five buttons. Give each client a small remote with only the buttons it needs, not one giant interface.
 
 ## D: Dependency Inversion Principle
 
@@ -106,6 +118,9 @@ class OrderService {
 Spring's dependency injection is DIP in practice; tests pass fakes instead of real databases.
 
 **Smell:** `new` of infrastructure classes inside business logic; static calls to external systems.
+
+> [!REAL] The standard power socket
+> Your laptop depends on "a standard socket", not on a specific power plant. Code should depend on an interface (`PaymentGateway`), not on a concrete class (`RazorpayClient`).
 
 ## Summary
 

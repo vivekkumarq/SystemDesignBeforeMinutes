@@ -17,6 +17,9 @@ void dispense() { /* and another */ }
 
 Every method repeats the same `if/else` on `state`. Adding a state ("maintenance mode") means editing every method, and invalid transitions are easy to miss.
 
+> [!REAL] A traffic signal
+> Red, green, yellow: the same "timer ticked" event does different things depending on the current state. Each state knows what comes next.
+
 ## Structure
 
 ```mermaid

@@ -6,6 +6,9 @@
 
 A file system has files and folders; folders contain files and other folders. To compute total size, code would otherwise check "is this a file or a folder?" at every level. Same for org charts (employees and teams), menus (items and submenus), UI layouts (widgets and panels), and orders (products and bundles).
 
+> [!REAL] Folders inside folders
+> A folder can hold files and other folders, and "size" works the same on both: a file returns its size, a folder adds up its children's sizes.
+
 ## Structure
 
 ```mermaid

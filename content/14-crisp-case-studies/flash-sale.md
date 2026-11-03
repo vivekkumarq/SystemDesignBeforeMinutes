@@ -1,5 +1,8 @@
 **In one line:** most traffic is absorbed before it reaches the core: pages are cached at the edge, users pass through a virtual waiting room, stock is decremented atomically in memory, and orders are processed asynchronously from a queue, so the database only ever sees a controlled trickle.
 
+> [!REAL] Crowd control at a stadium gate
+> Police don't let 50,000 fans rush one door; they use barricades, queues and tickets checked in batches. The waiting room, cache and queue in a flash sale are those barricades.
+
 ## Shaping a stampede into a stream
 
 ```mermaid

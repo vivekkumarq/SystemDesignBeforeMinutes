@@ -1,5 +1,8 @@
 This is a proposed design for a retail stock-trading app. Users place market and limit orders, see live prices, and track their holdings. **Correctness and fairness are critical**; peak load at market open is ~200,000 orders per minute. Find the problems first.
 
+> [!REAL] 9:15 a.m. on the NSE
+> When Indian markets open at 9:15, brokers like Zerodha and Groww see a burst of orders within seconds, and any mistake costs real money. Fairness (first come, first served) and correctness beat everything else here.
+
 ## The proposed design
 
 ```mermaid

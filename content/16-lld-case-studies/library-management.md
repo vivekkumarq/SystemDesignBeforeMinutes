@@ -1,3 +1,6 @@
+
+> [!REAL] Your college library
+> Books have copies; members borrow copies, not books; there's a limit per member, due dates and fines. Getting "book vs copy" right is the key modelling step.
 ## Requirements
 
 - The library holds **books** (title, author, ISBN) with one or more physical **copies** (book items, each with a barcode).

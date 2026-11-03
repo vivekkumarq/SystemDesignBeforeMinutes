@@ -1,3 +1,6 @@
+
+> [!REAL] The mall parking you use every week
+> A ticket at the entry, floors with bike, car and large-vehicle spots, an "available" board per floor and payment at exit. Model exactly what you see in a real mall basement.
 ## Requirements
 
 - A lot has multiple **floors**; each floor has **spots** of types: SMALL (bike), MEDIUM (car), LARGE (bus/truck).

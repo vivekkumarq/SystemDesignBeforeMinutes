@@ -1,5 +1,8 @@
 **In one line:** "People You May Know" is mostly **precomputed**: batch graph jobs find friends-of-friends and other signals, a model scores the candidates, and each user's top suggestions are stored ready to serve, then lightly refreshed by real-time events such as a new connection.
 
+> [!REAL] The matchmaker's list prepared in advance
+> A family matchmaker doesn't start researching when you call; they've already prepared a shortlist. PYMK is mostly a shortlist computed overnight.
+
 ## Why not compute it on request?
 
 Friends-of-friends for someone with 500 connections, each with 500 connections, is 250,000 people to consider, and that's before scoring. Doing that on every page view for hundreds of millions of members is wasteful. So the heavy work happens in advance.

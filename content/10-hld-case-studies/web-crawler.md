@@ -14,6 +14,9 @@ Design a web crawler like Googlebot: starting from seed URLs, continuously disco
 - **Freshness and priority:** important and frequently changing pages are crawled more often.
 - **Extensible:** add new content types or processing later.
 
+> [!REAL] Think Googlebot
+> Googlebot visits billions of pages, again and again, without overloading any one website. The crawler is a huge, polite to-do list of URLs.
+
 ## 2. Estimates
 
 - Target: 1B pages per month → ~400 pages/s average; aim for ~1,000+/s.
@@ -72,6 +75,9 @@ flowchart TB
   H --> FE[Fetcher workers]
 ```
 
+> [!REAL] A delivery agent's route
+> A delivery agent visits many houses but never rings the same doorbell 50 times a minute. The frontier keeps one queue per website and waits between requests to the same site.
+
 ### Distribution
 - Partition the work **by host** (hash of hostname → crawler node). Each node owns its hosts' politeness state, DNS and robots caches. No cross-node coordination per request.
 - Newly discovered URLs are routed to the owning node via a queue (Kafka).
@@ -81,10 +87,16 @@ flowchart TB
 - **Normalise** first: lowercase host, remove default ports, resolve relative links, strip fragments and tracking parameters, sort query params.
 - Check a **Bloom filter** (fast, in memory, small false-positive rate means occasionally skipping a new URL, which is acceptable), backed by a persistent URL store for exact state (last crawl time, status, priority).
 
+> [!REAL] The visitors' register
+> Before visiting, check the register: have we already been here? With billions of URLs, a Bloom filter answers "definitely not seen" cheaply.
+
 ### Have we seen this content?
 Different URLs often serve the same content. Compute a **fingerprint**:
 - Exact duplicates: a hash (e.g. SHA-256) of normalised content.
 - Near-duplicates: **SimHash** or MinHash, where similar documents produce similar fingerprints, so pages differing only by ads or timestamps are detected.
+
+> [!REAL] The same news article on 50 sites
+> A news agency story is republished on 50 websites. Content fingerprints (hashes) stop the crawler from storing and indexing 50 copies.
 
 ### Politeness and robots.txt
 - Fetch and cache `robots.txt` per host (refresh daily); obey disallow rules and crawl-delay.
@@ -96,6 +108,9 @@ Different URLs often serve the same content. Compute a **fingerprint**:
 - **Spider traps:** infinite calendars, session IDs in URLs, endlessly deep paths. Limit URL length and depth, cap pages per host per crawl cycle, detect repeating path patterns.
 - Timeouts (connect and read), maximum page size, limited redirect hops, content-type filtering.
 - Parsing in sandboxed workers; malformed pages shouldn't crash the pipeline.
+
+> [!REAL] An endless calendar
+> A calendar page with a "next month" link goes on forever. Limit depth, URL length and pages per site so the crawler doesn't wander into infinity.
 
 ### DNS
 DNS lookups can be a major bottleneck at thousands of fetches per second. Run local caching resolvers and asynchronous resolution; cache results per host for their TTL.

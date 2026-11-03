@@ -13,6 +13,9 @@
 | **Logging / metrics proxy** | Observability | Time each call |
 | **Smart reference** | Lifecycle | Reference counting, locking |
 
+> [!REAL] The bank's security guard
+> You talk to the guard, who checks your ID before letting you near the vault. A proxy stands in front of a real object to control access, cache results or load it lazily.
+
 ## Structure
 
 ```mermaid

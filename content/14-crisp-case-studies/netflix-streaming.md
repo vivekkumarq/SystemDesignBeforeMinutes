@@ -1,5 +1,8 @@
 **In one line:** the video is already sitting on a server inside or next to your internet provider, encoded in many qualities, and the player starts with a small, low-bitrate segment and ramps up quality as the buffer fills, so playback begins in about a second.
 
+> [!REAL] The movie is already in your town
+> When you press Play, the film is not coming from the US; it's usually on a Netflix box sitting inside your internet provider's network, a few milliseconds away.
+
 ## Where the bytes come from
 
 ```mermaid

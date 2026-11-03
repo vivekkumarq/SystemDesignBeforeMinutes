@@ -9,6 +9,9 @@ Design a **ticket booking system** for movies and live events (think BookMyShow 
 
 **Your turn:** 35 minutes on your canvas.
 
+> [!REAL] Think BookMyShow on release day
+> When bookings open for a big film's first-day shows, thousands of people tap the same seats at the same second. Exactly one person must get each seat.
+
 ## Hints
 
 <details>

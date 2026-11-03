@@ -15,6 +15,9 @@ Design a collaborative document editor like Google Docs: many people edit the sa
 - Most documents have few simultaneous editors (1–10); some have hundreds of viewers.
 - Durable storage; access control enforced on every operation.
 
+> [!REAL] Think Google Docs
+> Several people type in the same document at once and see each other's cursors in real time. When two people type at the same spot, everyone must end up with exactly the same text.
+
 ## 2. The core problem: concurrent edits
 
 Document: `"cat"`. Alice inserts `"h"` at position 1 (→ `"chat"`). At the same time Bob deletes position 2 (`"t"`, → `"ca"`). If each simply applies the other's raw operation:
@@ -27,6 +30,9 @@ They diverge. Positions shift under concurrent changes. Two families of algorith
 Before applying a remote operation, **transform** it against concurrent operations already applied, adjusting positions. Bob's "delete 2" transformed against Alice's "insert at 1" becomes "delete 3", and both get `"cha"`.
 - Usually relies on a **central server** that defines a single order of operations; clients transform their pending ops against what the server sends.
 - Mature and efficient (used by Google Docs), but transformation functions for rich text are intricate.
+
+> [!REAL] Adjusting directions after someone moves
+> "Insert 'hello' at position 10" must become "position 15" if someone just added 5 characters before it. OT rewrites each edit in light of the edits that arrived first. Google Docs is built on OT.
 
 ### CRDTs (Conflict-free Replicated Data Types)
 Give every character a **unique, ordered identifier** (e.g. based on site ID and a counter, positioned between its neighbours). Inserts reference identifiers, not indexes, so concurrent operations commute: applying them in any order yields the same result.
@@ -41,6 +47,9 @@ Give every character a **unique, ordered identifier** (e.g. based on site ID and
 | Complexity | Transform functions | Data structure design |
 
 Either works in an interview; say which and why. A server-centric OT design is simpler to reason about at scale; CRDTs win for offline-first.
+
+> [!REAL] Every letter has its own ID
+> Instead of positions, every character gets a unique ID, and edits say "insert after character X". Copies can merge in any order and still agree. Figma, and libraries like Yjs and Automerge, use CRDT-style approaches.
 
 ## 3. High-level design
 
@@ -64,6 +73,9 @@ All editors of a document connect to the **same collab server** (the document's 
 - transforms it if needed (OT), appends it to the operation log, and broadcasts it to the other clients.
 
 This makes ordering simple and avoids distributed coordination per keystroke.
+
+> [!REAL] One chairperson per meeting
+> All edits to one document go through the same server, like one chairperson deciding the order in which people speak. That makes ordering simple.
 
 ### Client behaviour
 - Apply local edits immediately (optimistic), send them to the server with the last seen server version.

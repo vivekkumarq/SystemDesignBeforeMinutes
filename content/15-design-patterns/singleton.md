@@ -6,6 +6,9 @@
 
 Some things should exist once per process: a configuration registry, a connection pool, a metrics registry, an in-memory cache, a hardware interface. Creating several would waste resources or cause conflicting state.
 
+> [!REAL] The country's one Prime Minister
+> Some things should exist once: one configuration registry, one connection pool manager. Like a country, it needs one head of government, and everyone must reach the same one.
+
 ## Implementations in Java (from worst to best)
 
 ### 1. Eager initialisation

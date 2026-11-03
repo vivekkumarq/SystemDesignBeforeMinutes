@@ -1,5 +1,8 @@
 **In one line:** uploads go in chunks straight to storage, get split and transcoded in parallel into many small segments at several qualities, and are served from caches close to viewers, so no single machine ever handles a whole video or a whole audience.
 
+> [!REAL] A factory assembly line
+> The upload is cut into pieces, and many workers process the pieces at the same time, like an assembly line, instead of one worker building the whole car.
+
 ## The flow
 
 ```mermaid

@@ -14,6 +14,9 @@ EmailPromotion, SmsPromotion, PushPromotion   → 3 × 3 = 9 classes
 
 Add WhatsApp and a new "security" type, and it becomes 4 × 4 = 16. Every combination is a class.
 
+> [!REAL] Remotes and TVs
+> Any remote (basic, advanced) can work with any TV brand (Sony, Samsung). You don't build a separate remote for every combination; the remote and the TV are joined by a common protocol.
+
 ## The bridge
 
 Separate **what** the notification is (abstraction) from **how** it is delivered (implementation), and let the abstraction hold a reference to an implementation.

@@ -6,6 +6,9 @@
 
 When an order ships, the email service, the SMS service, the analytics module and the loyalty-points module all need to react. If `OrderService` calls each of them directly, it's coupled to all of them, and adding a new reaction means editing `OrderService`.
 
+> [!REAL] YouTube subscriptions
+> You subscribe once and get notified about every new upload. The channel doesn't need to know who you are; it just notifies its list of subscribers.
+
 ## Structure
 
 ```mermaid

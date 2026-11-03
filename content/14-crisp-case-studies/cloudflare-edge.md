@@ -1,5 +1,8 @@
 **In one line:** the same IP addresses are announced from hundreds of data centres worldwide (anycast), so internet routing delivers every user to a nearby one; each location runs the full stack (caching, security, compute) and can serve or protect your site without reaching your origin.
 
+> [!REAL] One emergency number, hundreds of control rooms
+> Dial 112 anywhere and you reach the nearest control room. Cloudflare announces the same IP from hundreds of cities, so your request reaches the nearest one.
+
 ## Anycast: one address, many places
 
 ```mermaid

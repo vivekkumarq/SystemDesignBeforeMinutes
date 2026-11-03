@@ -1,5 +1,8 @@
 **In one line:** the server stores every message until each recipient device acknowledges it, the sender retries with a unique message ID until the server acknowledges, and devices resync from where they left off when they reconnect. Delivery is "store and forward with acknowledgements at every hop".
 
+> [!REAL] The courier's proof of delivery
+> One grey tick: the courier office has your parcel. Two grey ticks: it reached the recipient's door. Blue ticks: they opened it. Each tick is an acknowledgement in the chain.
+
 ## The chain of acknowledgements
 
 ```mermaid

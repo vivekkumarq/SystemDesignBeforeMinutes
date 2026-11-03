@@ -1,5 +1,8 @@
 **In one line:** drivers' live positions are kept in memory in a geographic grid, so finding nearby drivers is a lookup of a few grid cells; candidates are ranked by real travel time, and the chosen driver is locked with an atomic state change.
 
+> [!REAL] The auto stand outside the station
+> The coordinator doesn't phone every auto in the city; he looks at the autos waiting nearby and sends you to the closest free one. Once he points at an auto, nobody else can take it.
+
 ## The flow
 
 ```mermaid

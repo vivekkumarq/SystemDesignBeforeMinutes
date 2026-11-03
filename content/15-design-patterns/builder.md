@@ -10,6 +10,9 @@ new Pizza("large", true, false, true, false, true, "thin", 2);   // what does ea
 
 Many parameters, many of them optional, lead to unreadable calls, constructor overloads for every combination, or mutable objects filled by setters (which can be observed half-built and can't be immutable).
 
+> [!REAL] Customising a Subway sandwich
+> Bread, cheese, veggies, sauces, toasted or not: you add one choice at a time and say "done" at the end. A builder sets options step by step instead of a constructor with 12 arguments.
+
 ## The builder
 
 ```java

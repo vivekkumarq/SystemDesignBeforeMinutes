@@ -1,3 +1,6 @@
+
+> [!REAL] The game from the back of your notebook
+> Simple rules, which makes it a great test of clean classes: Board, Player, Game, a win check and pluggable computer players.
 ## Requirements
 
 - Two players (human or computer) take turns placing their symbol (X or O) on an **N × N** board (default 3).

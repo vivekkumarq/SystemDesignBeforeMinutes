@@ -6,6 +6,9 @@
 
 Placing an order touches inventory, pricing, payments, shipping and notifications, each with its own API and correct calling order. If every controller, batch job and admin tool calls them directly, the orchestration logic is duplicated and every client breaks when the subsystem changes.
 
+> [!REAL] The "one-click" home theatre button
+> One button dims the lights, turns on the projector, sets the amplifier and starts the film. A facade gives a simple front to a complicated set of subsystems.
+
 ## The facade
 
 ```mermaid

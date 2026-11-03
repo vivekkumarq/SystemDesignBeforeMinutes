@@ -1,5 +1,8 @@
 **In one line:** stream every post through a pipeline that extracts terms and hashtags, counts them in short time windows, and ranks terms whose **current rate is unusually high compared with their normal baseline**, not just the most frequent terms.
 
+> [!REAL] Not the loudest, the suddenly loud
+> "Good morning" is said a million times every day, so it's never trending. A hashtag that jumps from 100 to 50,000 mentions in an hour, after a last-ball six, is.
+
 ## Why "most frequent" isn't "trending"
 
 "Good morning" is said millions of times every day. It's popular, not trending. A trend is a **sudden acceleration**: a term at 40× its usual rate right now.

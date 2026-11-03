@@ -1,5 +1,8 @@
 **In one line:** edits are sent as small operations (insert "x" at position 12), a server puts them in a single order, and each operation is **transformed** against concurrent ones so that positions still point to the right place, so everyone ends up with identical text.
 
+> [!REAL] Two people correcting the same printed page
+> If you insert a word at the start of a line and your friend deletes a word near its end, their position must shift by your insertion. OT is the bookkeeping that makes both corrections land correctly.
+
 ## The problem in one example
 
 Text: `"cat"`. Alice inserts `h` at position 1 → `"chat"`. Simultaneously Bob deletes position 2 (`t`) → `"ca"`. Applying each other's raw operations makes them diverge (`"cht"` vs `"cha"`), because Alice's insert shifted the position Bob meant.

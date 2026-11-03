@@ -13,6 +13,9 @@ Design a service like TinyURL or bit.ly: turn a long URL into a short code, redi
 - Short codes must be unique and should not be easily guessable in sequence (to avoid enumeration).
 - Durable: links shouldn't disappear.
 
+> [!REAL] Think bit.ly or a WhatsApp business link
+> Bit.ly has shortened billions of links. The job is simple (map a short code to a long URL), but reads hugely outnumber writes: one link shared in a cricket WhatsApp group may be clicked 100,000 times.
+
 ## 2. Estimates
 
 - 100M new URLs/month → ~40 writes/s average, ~100/s peak.
@@ -52,11 +55,17 @@ The only hot query is "get long_url by code", a pure key lookup. A key-value or 
 ### Option B: counter + base62 encoding
 A global unique number, encoded in base62: `125 → "21"`. Short and collision-free. Problems: a single counter is a bottleneck and SPOF, and sequential codes are guessable.
 
+> [!REAL] Token numbers at a bank
+> Each new link gets the next token number, written compactly in base62 (0–9, a–z, A–Z). Seven characters give 62⁷ ≈ 3.5 trillion codes, enough for a very long time.
+
 ### Option C: pre-allocated ID ranges (recommended)
 A **key-generation service** hands out ranges of IDs (e.g. blocks of 10,000) to each app server, which encodes them locally. Coordination happens once per block, not per request.
 - Store range allocation in a small strongly consistent store (ZooKeeper/etcd or a DB row with an atomic increment).
 - To avoid guessable sequences, apply a reversible scramble (e.g. a keyed permutation / Feistel network over the 42-bit ID) before base62 encoding.
 - A server that crashes wastes the rest of its block. That's fine with trillions available.
+
+> [!REAL] Each branch gets its own book of cheques
+> Head office gives each branch a book of cheque numbers (1–1,000,000 to branch A, 1,000,001–2,000,000 to branch B). Branches issue numbers without phoning head office, and numbers never clash.
 
 ### Option D: random codes
 Generate 7 random base62 characters and insert with a uniqueness check (`PUT if not exists`). Simple and unguessable; collisions are rare at first but grow as the space fills, so retry on conflict.
@@ -94,11 +103,17 @@ flowchart LR
 ### Caching
 Link popularity follows a power law, so a modest cache gives a very high hit ratio. Cache-aside with LRU/LFU eviction; a long TTL is fine because mappings rarely change (delete on update or delete). For extremely viral links, cache at the CDN edge too: the redirect response itself can be cached briefly.
 
+> [!REAL] The most popular links stay on the counter
+> A small number of links get most of the clicks. Keeping those in Redis and at the CDN means most redirects never touch the database.
+
 ### Scaling the store
 Shard by `code` (hash-based) so lookups go to exactly one shard. Replicate for availability. 3 TB over five years is modest.
 
 ### Analytics
 Count clicks via a stream processor that aggregates per code per minute/hour/day and writes rollups to a time-series or columnar store. Raw events go to a data lake for deeper analysis. Approximate counts (HyperLogLog) work for unique visitors.
+
+> [!REAL] Counting clicks without slowing the redirect
+> The redirect returns immediately; the click is dropped onto a queue and counted later. Like a turnstile that counts people without making them stop.
 
 ### Expiry and cleanup
 Store `expires_at`; the redirect path checks it (return 410 Gone). A background job, or the store's native TTL, deletes expired rows. Codes can be recycled only after a long quarantine, or never.

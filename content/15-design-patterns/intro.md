@@ -14,6 +14,9 @@ A design pattern is a named, reusable solution to a problem that keeps coming up
 | **Structural** | How are objects composed into larger structures? | Adapter, Bridge, Composite, Decorator, Flyweight, Facade, Proxy |
 | **Behavioural** | How do objects communicate and share responsibility? | Strategy, Observer, Template Method, State |
 
+> [!REAL] Building a house
+> Creational patterns decide how things get built (the contractor). Structural patterns decide how parts fit together (the plumbing and wiring). Behavioural patterns decide how the people inside interact (the house rules).
+
 ## Principles underneath every pattern
 
 Patterns are applications of a few deeper ideas. Learn these and the patterns become obvious:

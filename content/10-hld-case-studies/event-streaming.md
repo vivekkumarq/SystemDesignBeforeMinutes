@@ -15,6 +15,9 @@ Design a distributed event streaming platform like Apache Kafka: producers appen
 - Horizontal scalability; high availability through broker failures.
 - Ordering guaranteed per partition.
 
+> [!REAL] Designing your own Kafka
+> This is designing something like Kafka: an append-only log split into partitions, replicated across machines, which many consumers read at their own pace.
+
 ## 2. Estimates
 
 - 2M records/s × 1 KB = 2 GB/s ingest; × 3 replicas = 6 GB/s written cluster-wide.
@@ -58,6 +61,9 @@ flowchart LR
 - **Retention** deletes whole old segments (cheap; no per-record deletes). **Compaction** rewrites old segments keeping the latest record per key.
 - Writes are sequential; reads of recent data are served from the OS page cache; **zero-copy** (`sendfile`) sends bytes from page cache to sockets without copying through user space.
 
+> [!REAL] Notebooks with numbered pages
+> Each partition is a series of notebooks (segments). When one fills, a new one starts. Old notebooks are thrown away after the retention period, all at once, which is very cheap.
+
 ### Producing
 - The producer fetches metadata (which broker leads each partition) and sends batches directly to leaders.
 - Partition choice: hash of key (ordering per key) or sticky round-robin for keyless records.
@@ -86,6 +92,9 @@ sequenceDiagram
   Note over L: high watermark → 550
   L-->>Pr: ack (acks=all)
 ```
+
+> [!REAL] Copies that must keep up
+> Followers copy the leader's notebook. Only followers that are caught up (the in-sync replicas) can take over if the leader dies, so no confirmed message is lost.
 
 ### Leader election and metadata
 - A **controller quorum** (Raft-based) stores cluster metadata as a replicated log: topics, partition assignments, leaders, ISR.

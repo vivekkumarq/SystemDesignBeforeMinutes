@@ -10,6 +10,9 @@ Design a **food delivery platform** (think Swiggy, Zomato, DoorDash):
 
 **Your turn:** 35 minutes on your canvas. (If you did the related "Find the Flaw" review, try not to reuse its answer.)
 
+> [!REAL] Think Swiggy or Zomato
+> Three apps (customer, restaurant, rider) must agree on one order's state, in real time, across hundreds of cities, with the biggest spike at dinner time.
+
 ## Hints
 
 <details>

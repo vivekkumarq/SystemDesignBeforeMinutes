@@ -8,6 +8,9 @@
 - You have a few **preconfigured variants** and want copies to tweak: "standard invoice template", "free-tier account settings", "default enemy in a game".
 - Code must copy objects **without knowing their concrete classes**.
 
+> [!REAL] Photocopying a filled-in form
+> If a form is 90% the same every time, you photocopy a filled one and change two fields. Cloning a prepared object is cheaper than building it from scratch.
+
 ## Structure
 
 ```mermaid

@@ -6,6 +6,9 @@
 
 A data source can optionally compress, encrypt and log. Subclassing every combination gives `CompressedEncryptedLoggedFileDataSource` and friends: 2³ = 8 classes for 3 features, and you can't change combinations at runtime.
 
+> [!REAL] Toppings on a pizza
+> Start with a base pizza and wrap it with cheese, then olives, then jalapeños. Each topping adds to the price and the description without a new class for every combination.
+
 ## The decorator
 
 Each decorator implements the same interface, holds the wrapped object, and adds behaviour before/after delegating.

@@ -16,6 +16,9 @@ Design a service like Uber or Ola: riders request a trip, nearby drivers are mat
 - Consistency: a driver must never be assigned to two trips at once; payments exactly once.
 - Scale: global, with heavy city-level hot spots (stadiums, airports, rain).
 
+> [!REAL] Think Uber, Ola or Rapido
+> Every few seconds, each active driver's phone sends its GPS location. A rider's request must find nearby free drivers within a second or two, offer the trip to one, and never give the same driver to two riders.
+
 ## 2. Estimates
 
 - 20M daily trips; peak ~3× average → ~700 trip requests/s at peak.
@@ -82,6 +85,9 @@ Store `cell → set of available driver IDs` in memory (e.g. Redis `GEOADD`/`GEO
 
 **Partitioning:** shard the geo index by city/region. Hot cells (airport) can be split further or handled by more replicas.
 
+> [!REAL] Grid squares on a city map
+> Draw a grid over the city. To find drivers near you, look in your square and the eight around it, not the whole city. Geohash, quadtrees and Uber's open-source H3 hexagon grid are all versions of that grid.
+
 ### Matching
 - Candidates: available drivers within N km (expand the radius if too few).
 - Rank by **ETA** from a routing engine, not straight-line distance (a driver across a river is far away).
@@ -97,6 +103,9 @@ SET driver:981:state ON_TRIP:trip_55 only if current = AVAILABLE   (Redis WATCH/
 
 Only one succeeds; the loser moves to its next candidate. Driver state lives in one partition per driver so the check is local.
 
+> [!REAL] The last seat in the auto
+> Two riders mustn't both get the same driver. A short lock or an atomic "set driver status from available to offered" ensures only one request wins.
+
 ### Location ingestion at 1.25M writes/s
 - Drivers send updates over a persistent connection; the location service validates and updates the in-memory index (last position only).
 - Updates are also published to **Kafka** for trip tracking, ETA model training, fraud detection and billing (distance travelled).
@@ -107,6 +116,9 @@ A WebSocket gateway keeps a connection per active app. The gateway registers `us
 
 ### Surge pricing
 Per cell, compute demand (open requests) vs supply (available drivers) over a sliding window with a stream processor; publish a multiplier per cell every ~30–60 s. Lock the quoted price with the estimate ID for a few minutes so the rider pays what they saw.
+
+> [!REAL] Rain in Mumbai at 6 p.m.
+> When demand in an area outruns supply, prices rise there to pull in more drivers and cool demand. The system computes demand and supply per grid cell every minute or so.
 
 ### Trip state and payments
 - Trip service is the source of truth; state transitions are validated (can't complete a cancelled trip) and stored in a sharded relational/NewSQL database (shard by trip ID or city).

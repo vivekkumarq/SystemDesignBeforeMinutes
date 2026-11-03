@@ -1,5 +1,8 @@
 **In one line:** repositories are spread across many storage servers, each replicated to several machines with a consensus-style write protocol; metadata such as issues and pull requests lives in sharded relational databases; and heavy work (CI, search indexing, notifications) runs asynchronously in job queues.
 
+> [!REAL] A library with two kinds of records
+> The books themselves (Git repositories) are stored on many shelves with copies. The catalogue cards (issues, pull requests, users) live in a separate, carefully indexed register.
+
 ## Two very different kinds of data
 
 | Data | Nature | Where |

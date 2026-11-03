@@ -13,6 +13,9 @@ Design a video platform like YouTube: creators upload videos, the platform proce
 - Massive scale: ~500 hours of video uploaded per minute; billions of views per day.
 - Cost efficiency: storage and bandwidth dominate the bill.
 
+> [!REAL] Think YouTube or Hotstar
+> YouTube has reported more than 500 hours of video uploaded every minute. Disney+ Hotstar has set live-streaming records with tens of millions of viewers watching the same cricket match at once. Upload, processing and delivery are three different problems.
+
 ## 2. Estimates
 
 - Uploads: 500 h/min ≈ 720K hours/day. Raw ~1 GB/hour (compressed source) → ~720 TB/day of originals.
@@ -68,6 +71,9 @@ To process fast, the orchestrator **splits the video into chunks** (by GOP/scene
 
 Popular videos can be **re-encoded** later with more expensive, more efficient settings; long-tail videos get cheaper encodes. Encoding effort follows popularity.
 
+> [!REAL] One movie, many sizes
+> The same film is prepared as 4K, 1080p, 720p and 360p, like a tailor making the same shirt in S, M, L and XL. Each video is cut into small chunks so many workers can transcode it in parallel.
+
 ### Adaptive bitrate streaming (ABR)
 The player downloads the manifest, starts with a low/medium bitrate for a fast start, measures throughput and buffer level, and switches rendition **per segment**. Bad network → lower quality instead of buffering. Segments are plain HTTP objects, so CDNs cache them perfectly.
 
@@ -83,12 +89,18 @@ sequenceDiagram
   P->>C: GET 480p/seg_4.ts (network dropped)
 ```
 
+> [!REAL] The quality drop in a lift
+> When you step into a lift and your signal drops, the video gets blurry but keeps playing. The player measures your speed and picks the next 4-second chunk at a lower quality instead of stopping to buffer.
+
 ### Delivery: CDN and edge caching
 - Segments are immutable → long TTLs and very high hit ratios.
 - **Tiered caching:** edge PoPs → regional shields → origin storage.
 - **ISP-embedded caches** (appliances inside ISPs' networks) serve popular content without crossing the internet.
 - **Pre-positioning:** push expected-popular content (a new episode) to edges ahead of demand.
 - **Long tail:** most videos are rarely watched; they're served from origin/regional tiers, and that's fine.
+
+> [!REAL] Cinema halls in every town
+> Instead of everyone travelling to one cinema, the film is screened in halls in every town. Netflix's Open Connect boxes inside ISPs are those town halls.
 
 ### Storage tiers and cost
 - Hot (recently uploaded/popular): standard object storage, many renditions.

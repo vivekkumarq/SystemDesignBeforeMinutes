@@ -1,5 +1,8 @@
 **In one line:** search runs on a fast, eventually consistent index that may be slightly out of date, but the booking itself goes through a strongly consistent availability check that atomically claims the dates. The database, not the search index, makes a double booking impossible.
 
+> [!REAL] Browsing a hotel catalogue vs booking at the desk
+> The brochure (search) can be a little out of date. The front desk (booking) checks the actual room register before handing you a key.
+
 ## Two paths, two consistency levels
 
 ```mermaid

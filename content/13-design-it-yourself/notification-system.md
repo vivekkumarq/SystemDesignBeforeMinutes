@@ -9,6 +9,9 @@ Design a notification service used by every team in a large company to send **pu
 
 **Your turn:** 35 minutes. Requirements → estimates → API → data → diagram → deep dives.
 
+> [!REAL] Think OTPs, order updates and offers
+> Your OTP must arrive in seconds, your "order delivered" update within a minute, and the "50% off" offer whenever, but never at 3 a.m. One system, very different priorities.
+
 ## Hints
 
 <details>

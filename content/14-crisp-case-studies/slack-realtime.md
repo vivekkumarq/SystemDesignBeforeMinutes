@@ -1,5 +1,8 @@
 **In one line:** every client keeps one persistent WebSocket to a gateway; messages are saved first, then published to the channel's topic in a pub/sub layer, which fans them out only to the gateway servers that have members of that channel connected.
 
+> [!REAL] An office intercom per room
+> A message for #engineering is announced only in the rooms (servers) where engineering people are sitting, not across the whole building.
+
 ## The path of one message
 
 ```mermaid

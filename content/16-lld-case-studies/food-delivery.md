@@ -1,3 +1,6 @@
+
+> [!REAL] One Swiggy order's journey
+> Placed → accepted by the restaurant → being prepared → picked up → delivered. Each step is a state, and pricing rules (delivery fee, offers, taxes) chain together.
 ## Requirements (LLD scope)
 
 - **Restaurants** have menus of **items** (price, availability).

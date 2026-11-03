@@ -1,3 +1,6 @@
+
+> [!REAL] Booking an Ola or Uber
+> Rider requests, a driver is matched, the trip moves through states (requested, accepted, started, completed) and the fare uses a pricing strategy that can include surge.
 ## Requirements (LLD scope)
 
 - **Riders** request a ride (pickup, drop, vehicle type: BIKE/AUTO/CAB).

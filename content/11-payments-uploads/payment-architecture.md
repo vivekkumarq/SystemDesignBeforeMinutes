@@ -16,6 +16,9 @@ Design the payment system for an e-commerce marketplace: customers pay for order
 - Security and compliance: PCI DSS, encryption, audit trails.
 - Scale: e.g. 10M payments/day → ~120/s average, ~2,000/s at flash-sale peaks. Modest throughput; correctness dominates.
 
+> [!REAL] Think Razorpay or Stripe
+> A payment system must never charge twice, never lose a successful payment, and handle banks that time out or reply minutes later. Correctness matters far more than speed.
+
 ## 2. High-level design
 
 ```mermaid
@@ -94,8 +97,14 @@ Layered defences:
 
 See [Payment State Machines & Idempotency](#/l/11-payments-uploads/state-machine-idempotency).
 
+> [!REAL] The idempotency key
+> Your app sends `Idempotency-Key: order_8841` with the charge. If the network drops and the app retries, the payment service sees the same key and returns the first result instead of charging again.
+
 ### Timeouts and unknown outcomes
 If the PSP call times out, mark the payment `UNKNOWN`, **not failed**. A recovery worker queries the PSP status API with backoff (and the webhook may arrive first). Only after a definitive answer do we transition and inform the customer. Show "processing" in the UI meanwhile.
+
+> [!REAL] "Amount debited, transaction failed"
+> Every UPI user has seen this. The bank debited you but the response got lost. The system marks the payment "pending", asks the bank for the status, and either confirms it or auto-refunds. It never guesses.
 
 ### Webhooks
 - Verify the signature, check timestamp freshness, return `200` fast, and enqueue.
@@ -112,6 +121,9 @@ Checkout is a saga: reserve inventory → authorise payment → confirm order �
 - Route by method, currency, cost, success rate.
 - If a PSP has elevated errors, a circuit breaker routes new payments to a backup PSP. **Never** retry the *same* payment on a different PSP while the first attempt's outcome is unknown; that's a double charge risk. Only re-route when the first attempt definitively failed.
 
+> [!REAL] Two payment gateways
+> If one gateway's success rate drops during a sale, traffic shifts to another. Large merchants route payments across several gateways for this reason.
+
 ### Data and consistency
 - Payments DB: relational (PostgreSQL/MySQL), synchronous replication to a standby in another zone (RPO ≈ 0), automatic failover.
 - Partition by merchant or payment ID if volume grows; at ~2K/s peak, one well-sized primary is usually enough.
@@ -120,6 +132,9 @@ Checkout is a saga: reserve inventory → authorise payment → confirm order �
 
 ### Refunds
 A refund is a new operation against a captured payment, with its own idempotency key and state (`REFUND_PENDING → REFUNDED/FAILED`), limited to the remaining refundable amount (enforced with a conditional update), and its own ledger entries.
+
+> [!REAL] Returning the money, not deleting the payment
+> A refund is a new transaction in the opposite direction, never an edit to the original. The history must show both.
 
 ### Payouts
 Merchant balances accumulate in the ledger. A scheduled job computes payable amounts (minus commission, refunds, reserves for disputes), creates payout instructions idempotently, calls bank APIs, tracks status, and reconciles against bank statements.

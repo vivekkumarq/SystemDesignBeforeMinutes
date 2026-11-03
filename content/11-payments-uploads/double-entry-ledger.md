@@ -9,6 +9,9 @@ A ledger is the system of record for money. The accounting world solved "how do 
 
 A balance should be **derived from immutable entries**, not edited in place.
 
+> [!REAL] The shopkeeper's khata
+> If a shopkeeper only writes "Sharma ji owes ₹540" and erases it each time, he can't prove how it got there. A ledger lists every entry, so the balance can always be recomputed and checked.
+
 ## Double-entry in one rule
 
 Every transaction is recorded as **at least two entries** that **sum to zero**: money always comes *from* somewhere and goes *to* somewhere.
@@ -31,6 +34,9 @@ A card payment of ₹1,000 with a ₹20 fee might post:
 | Fee revenue | | ₹20 |
 
 If any transaction doesn't balance, something is wrong and the system rejects it. Money can't be created or destroyed by accident.
+
+> [!REAL] Money never appears or disappears
+> When you send ₹500 to a friend, your account gets −₹500 and theirs gets +₹500. Every transaction's entries add up to zero, so the books always balance. Accountants have worked this way for over 500 years.
 
 ## Data model
 
@@ -78,6 +84,9 @@ WHERE account_id = :asha AND balance >= 500 AND version = :v;
 ### Hot accounts
 A system account (e.g. "fee revenue") receives a posting from every transaction and becomes a write hot spot. Options: shard it into N sub-accounts and sum them, or batch its postings asynchronously, since system accounts rarely need real-time balances.
 
+> [!REAL] The company's main collection account
+> Every customer payment credits the same "merchant receivable" account, so it becomes a bottleneck. Split it into many sub-accounts and add them up when you need the total.
+
 ## Reconciliation
 
 Your ledger says one thing; the gateway, the bank and the card network each have their own records. **Reconciliation** compares them and explains every difference.
@@ -91,6 +100,9 @@ flowchart LR
   REC --> X[Breaks: missing, mismatched amount, duplicate]
   X --> OPS[Auto-fix rules or ops queue]
 ```
+
+> [!REAL] Matching your bank statement
+> At the end of the month you tick your expenses against the bank statement. Payment companies do the same every day with the bank's settlement file and investigate every mismatch.
 
 ### Typical steps (daily)
 1. **Ingest** external files: gateway transaction and settlement reports, bank statements.

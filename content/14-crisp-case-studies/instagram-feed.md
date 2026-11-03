@@ -1,5 +1,8 @@
 **In one line:** feeds are precomputed: when someone posts, the post ID is pushed into followers' ready-made timelines in an in-memory store, except for celebrities, whose posts are merged in at read time. Scrolling just reads the next page of IDs and fetches cached post details.
 
+> [!REAL] The newspaper delivered to your door
+> For normal accounts, new posts are "delivered" to followers' feeds in advance. A celebrity's posts are like a big-city newspaper: you pick it up at the stall when you open the app.
+
 ## Push for most, pull for celebrities
 
 ```mermaid

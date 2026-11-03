@@ -1,3 +1,6 @@
+
+> [!REAL] Scrolling your Instagram feed
+> Posts from people you follow, newest or best first, loaded a page at a time as you scroll, with likes and comments on each.
 ## Requirements (LLD scope)
 
 - Users create **posts** (text, optional media), **follow/unfollow** other users, **like** and **comment** on posts.
