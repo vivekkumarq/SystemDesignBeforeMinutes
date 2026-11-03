@@ -11,6 +11,9 @@
 | Coordination | Choreography (events) or orchestration (state machine) | Events/CDC project changes into read stores |
 | Typical example | Order → payment → inventory → shipping with refunds on failure | Orders written to PostgreSQL; order history/search served from Elasticsearch and Redis views |
 
+> [!REAL] Different problems
+> A saga is a wedding planner coordinating many vendors in steps. CQRS is a restaurant with a kitchen (writes) and a separate display menu board (reads) optimised for the customers.
+
 ## CQRS in more detail
 
 ```mermaid
@@ -30,6 +33,9 @@ flowchart LR
 - Often paired with **event sourcing** (the write model stores events, and read models are projections of them), but CQRS doesn't require it.
 
 **Use CQRS when:** reads vastly outnumber writes and need different shapes (search, analytics, feeds), or read and write workloads must scale separately, or the domain logic is complex. **Avoid it** for simple CRUD, where it's just extra moving parts.
+
+> [!REAL] The cricket scoreboard
+> The scorer records every ball in a detailed book (write model). The giant stadium scoreboard shows a summary built from it (read model), updated a moment later.
 
 ## Saga in brief
 

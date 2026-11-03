@@ -7,6 +7,9 @@ A **rebalance** is how a Kafka consumer group redistributes partitions among its
 - A consumer is **considered stuck** (no `poll()` within `max.poll.interval.ms`).
 - The subscribed topics change (partitions added, or a regex subscription matches a new topic).
 
+> [!REAL] Reassigning tables when a waiter leaves
+> When a waiter goes home or a new one joins, the manager redistributes the tables. While that happens, some tables wait for service.
+
 ## How it works
 
 One broker acts as the **group coordinator**. One consumer is chosen as the **group leader**, which computes the assignment.
@@ -35,10 +38,16 @@ Every consumer **revokes all** its partitions, everyone rejoins, and partitions 
 - Simple, but the whole group stops consuming during the rebalance, even for partitions that end up with the same owner.
 - With large groups or frequent rebalances (rolling deploys!), these pauses add up to significant lag.
 
+> [!REAL] Everyone stops and swaps tables
+> All waiters hand back every table and then get a new list. Simple, but the whole restaurant pauses.
+
 ### Cooperative (incremental)
 Consumers keep their partitions and only the partitions that **actually need to move** are revoked, over one or two quick rounds.
 - Most consumers keep working throughout.
 - Enabled with `partition.assignment.strategy=CooperativeStickyAssignor` (and on by default in newer client and protocol versions; Kafka's newer consumer group protocol moves assignment to the broker and makes rebalances incremental by design).
+
+> [!REAL] Move only the tables that must move
+> Only the leaving waiter's tables get reassigned; everyone else keeps serving. Much less disruption.
 
 ## Assignment strategies
 

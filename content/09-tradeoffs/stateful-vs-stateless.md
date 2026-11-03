@@ -12,6 +12,9 @@
 | Latency | Extra hop to fetch state | Can be faster (state is local) |
 | Examples | REST APIs, web servers | Databases, caches, WebSocket servers, game servers, stream processors |
 
+> [!REAL] Vending machine vs personal tailor
+> A vending machine is stateless: any machine gives the same chips for the same coins. A tailor is stateful: he keeps your measurements, and you must go back to him.
+
 ## Making a web tier stateless
 
 - **Sessions:** Redis/Memcached session store, or a signed token (JWT) carried by the client.
@@ -27,6 +30,9 @@ Once stateless, servers are cattle, not pets: autoscale, replace, deploy freely.
 - **Databases and caches:** their whole job is state.
 - **Stream processing:** windowed counts and joins keep state per key for speed.
 - **In-memory performance:** keeping a working set locally (e.g. a game world, an order book in a matching engine) avoids network hops.
+
+> [!REAL] The multiplayer game room
+> A BGMI match is stateful: all players in one game must be on the same server holding the game state. You can't bounce them between servers mid-match.
 
 ## Scaling stateful services
 

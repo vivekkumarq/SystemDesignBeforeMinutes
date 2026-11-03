@@ -2,6 +2,15 @@ A cache has limited memory. When it is full and a new item arrives, something mu
 
 ## The main policies
 
+```mermaid
+flowchart LR
+  F[Cache full,<br/>new item arrives] --> P{Which item leaves?}
+  P -- LRU --> A[Untouched the longest]
+  P -- LFU --> B[Used the fewest times]
+  P -- FIFO --> C[Added first]
+  P -- TTL --> D[Already expired]
+```
+
 ### LRU: Least Recently Used
 Evict the item that has not been accessed for the longest time. Based on the observation that recently used data is likely to be used again soon (temporal locality).
 
@@ -18,15 +27,24 @@ class LruCache<K, V> extends java.util.LinkedHashMap<K, V> {
 }
 ```
 
+> [!REAL] Clearing your phone's recent apps
+> When memory is full, Android closes the app you used longest ago. LRU evicts the item that hasn't been touched for the longest time.
+
 ### LFU: Least Frequently Used
 Evict the item accessed the fewest times.
 
 - **Strengths:** keeps long-term popular items even if they were not touched in the last few seconds; resists one-off scans.
 - **Weaknesses:** items that were popular long ago keep high counts and linger (**cache pollution**), unless counts decay over time; new items start with low counts and may be evicted before they prove themselves; more bookkeeping.
 
+> [!REAL] Keeping your favourite songs offline
+> Spotify offline storage full? Drop the songs you've played least often, even if you played one yesterday. LFU keeps popular items, even if not recent.
+
 ### FIFO: First In, First Out
 Evict the oldest inserted item, regardless of use.
 - Very cheap, but ignores popularity. Occasionally fine for data that naturally expires in order.
+
+> [!REAL] The queue at the bus stop
+> The first person in line boards first, no matter how important. FIFO evicts the oldest entry, even if it's still hugely popular, which is why it's rarely the best choice for caches.
 
 ### Random
 Evict a random item.
@@ -34,6 +52,9 @@ Evict a random item.
 
 ### TTL-based expiry
 Not strictly an eviction policy, but works alongside one: each item expires after a fixed time. Controls staleness rather than memory pressure.
+
+> [!REAL] Milk with an expiry date
+> Milk is thrown out on its expiry date even if the fridge has space. A 5-minute TTL on a stock price throws out an entry that might be stale, whether or not memory is tight.
 
 ### MRU: Most Recently Used
 Evict the most recently used item. Rarely useful, except for cyclic scans where the item just read is the one least likely to be read again soon.

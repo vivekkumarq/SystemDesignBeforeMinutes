@@ -19,6 +19,9 @@
 
 They are mainly a solution to an **organisational** problem: letting many teams work and release independently without stepping on each other (Conway's Law: systems mirror the communication structure of the organisations that build them). Technical benefits such as independent scaling and fault isolation are real but secondary for most companies.
 
+> [!REAL] A joint family vs separate homes
+> A joint family shares one kitchen: cheap and simple, but every decision needs everyone. Separate homes let each family decide independently, but now you have five electricity bills. Amazon split its monolith so hundreds of teams could ship without waiting for each other.
+
 ## The costs people underestimate
 
 - **Network unreliability:** every call can be slow or fail; you need timeouts, retries, circuit breakers.
@@ -26,6 +29,9 @@ They are mainly a solution to an **organisational** problem: letting many teams 
 - **Observability:** distributed tracing becomes mandatory.
 - **Operational overhead:** CI/CD per service, versioned APIs, service discovery, security between services.
 - **The distributed monolith trap:** services that must be deployed together, share a database or call each other synchronously in long chains have all the costs and none of the benefits.
+
+> [!REAL] Five homes, five problems
+> Every separate service needs its own deployment, monitoring, on-call and network calls that can fail. Segment and Amazon Prime Video have both written about moving pieces *back* into fewer services to cut that cost.
 
 ## The modular monolith: often the best start
 
@@ -40,6 +46,9 @@ flowchart TB
   end
   Monolith -. extract when needed .-> S1[Payments service]
 ```
+
+> [!REAL] One house, separate rooms
+> One building, but each family has its own room with a door. Clean boundaries without the overhead of separate houses. Shopify runs one of the largest Rails modular monoliths.
 
 ## When to move to microservices
 

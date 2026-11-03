@@ -15,6 +15,9 @@ A fast, scalable API is designed in, then **proved** by measurement. This lesson
 - **Connection pooling** and keep-alive for databases and downstream HTTP/gRPC.
 - **Timeouts and deadlines** so one slow dependency doesn't hold everything.
 
+> [!REAL] Cooking dal and rice together
+> You don't wait for the dal to finish before starting the rice; both cook at once. Calling three services in parallel instead of one after another cuts the wait to the slowest one.
+
 ### Reduce bytes
 - **Compression** (gzip/Brotli) for JSON.
 - **Binary formats** (Protocol Buffers) between services.
@@ -32,6 +35,9 @@ At scale, p99 matters more than average. Tail-latency reducers:
 - Avoid GC pauses and noisy neighbours; keep hot data in memory.
 - Remember that fan-out amplifies the tail: if a page calls 100 services, even a 1% slow rate per service makes most page loads slow.
 
+> [!REAL] The one slow checkout counter
+> If 99 customers are billed in 1 minute but one waits 20 minutes, that customer writes the angry review. p99 latency is that customer.
+
 ## Observability: the three pillars
 
 ### Metrics
@@ -44,11 +50,17 @@ Two well-known checklists:
 
 Record latency as **histograms** so you can compute p50/p95/p99. Averages hide problems.
 
+> [!REAL] The car's speedometer
+> Metrics are numbers over time: requests per second, error rate, latency. Like a speedometer, they tell you *that* something is wrong, fast.
+
 ### Logs
 Detailed records of individual events.
 - Use **structured logs** (JSON) with consistent fields: timestamp, level, service, request ID, user ID (if allowed), message.
 - Centralise them (ELK/OpenSearch, Loki, cloud logging).
 - Control volume: sample noisy debug logs; never log secrets or personal data you don't need.
+
+> [!REAL] The flight's black box
+> Logs record what happened, event by event. When something goes wrong, you read them to find out what happened.
 
 ### Traces
 A **distributed trace** follows one request across every service it touches. Each hop is a **span** with timing; all spans share a **trace ID** passed along in headers (W3C `traceparent`).
@@ -72,6 +84,9 @@ gantt
 
 The trace instantly shows the inventory query is the bottleneck. **OpenTelemetry** is the standard way to instrument metrics, logs and traces.
 
+> [!REAL] A parcel's tracking history
+> A trace shows one request's journey through every service with timings, like a courier's "Picked up → Hub → Out for delivery". You see exactly where it got stuck.
+
 ### Tie them together
 Put the **trace ID in every log line** and link metrics exemplars to traces. Then an alert on p99 latency leads to an example slow trace, which leads to that request's logs.
 
@@ -81,6 +96,9 @@ Put the **trace ID in every log line** and link metrics exemplars to traces. The
 - The **error budget** is what the SLO allows to fail (0.1%). Spend it on releases and experiments; when it's exhausted, prioritise reliability work.
 - **Alert on symptoms users feel** (error rate, latency SLO burn) rather than every CPU spike. Use multi-window **burn-rate alerts** to catch both fast and slow budget consumption.
 - Every alert should be actionable and link to a runbook.
+
+> [!REAL] Alert on what customers feel
+> Your doorbell should ring when a guest arrives, not every time a leaf moves. Alert on "checkout errors above 1%" (users feel it), not on "CPU at 70%" (they may not).
 
 ## Load testing and capacity
 

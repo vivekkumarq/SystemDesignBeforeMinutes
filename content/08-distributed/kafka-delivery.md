@@ -8,6 +8,9 @@
 | At least once | No | Possible |
 | Exactly once | No | No (for the effect) |
 
+> [!REAL] Three kinds of courier
+> At most once: courier throws the parcel over the gate; it might be lost. At least once: courier keeps trying until you sign, so you might get it twice. Exactly once: you get it once, which takes the most coordination.
+
 ## Producer side
 
 ### Acknowledgements (`acks`)
@@ -31,6 +34,9 @@ poll → commit offset → process
 ```
 If the consumer crashes during processing, those messages are skipped on restart. Lost, never duplicated.
 
+> [!REAL] Ticking a task before doing it
+> You tick "pay electricity bill" on your list, then your phone dies before you pay. The list says done; the bill isn't paid.
+
 ### At least once: process, then commit
 ```text
 poll → process → commit offset
@@ -39,6 +45,9 @@ If it crashes after processing but before committing, the messages are processed
 
 > [!WARNING] Auto-commit surprises
 > With `enable.auto.commit=true`, offsets are committed on a timer in the background, which can commit messages you haven't finished processing (loss on crash) or not commit ones you have (duplicates). For important pipelines, commit manually after processing.
+
+> [!REAL] Paying, then ticking
+> You pay, then your phone dies before you tick it. Tomorrow you might pay again unless the biller recognises the duplicate. That's why consumers must be idempotent.
 
 ## Exactly once
 
@@ -68,6 +77,9 @@ Kafka transactions can't include your database, an email or a payment API. For t
 - Store the processed offset (or event ID) **in the same database transaction** as the business change, and on restart resume from the stored offset.
 - Or deduplicate by event ID (an inbox table with a unique constraint).
 - Or make the operation naturally idempotent (`UPSERT`, `SET status = 'PAID'`).
+
+> [!REAL] The SMS has already gone
+> Kafka can make its own reads and writes exactly once, but if your consumer sends an SMS and then crashes, Kafka can't unsend the SMS. Use an idempotency key at the SMS provider or record "sent" before retrying.
 
 ## Recommended settings
 

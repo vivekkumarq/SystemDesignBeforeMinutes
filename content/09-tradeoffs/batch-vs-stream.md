@@ -19,6 +19,9 @@
 - Large backfills and data migrations.
 - Anything where results an hour later are fine and simplicity or cost matters.
 
+> [!REAL] Monthly salary processing
+> Salaries, monthly bank statements and nightly reports are batch: process everything at once on a schedule.
+
 ## Choose stream for
 
 - Fraud detection during a transaction.
@@ -26,6 +29,9 @@
 - Trending topics, live leaderboards.
 - Updating search indexes, caches and feeds within seconds.
 - IoT and sensor reactions.
+
+> [!REAL] Card fraud alerts
+> "Was that card swipe in Delhi and then Dubai within 10 minutes?" must be answered in seconds, not tomorrow morning. That's streaming.
 
 ## Stream-processing concepts you should know
 
@@ -37,6 +43,9 @@
 - **Watermarks:** the processor's estimate that "all events up to time T have probably arrived", which decides when to close a window. Allowed lateness handles stragglers.
 - **State:** counts and joins need state, kept locally and checkpointed (Flink) or backed by changelog topics (Kafka Streams).
 - **Exactly-once:** via checkpoints and transactional sinks.
+
+> [!REAL] Late-arriving letters
+> A letter posted on the 31st may arrive on the 2nd. Event time vs processing time and watermarks decide which month that letter counts towards.
 
 ## Architectures that combine them
 

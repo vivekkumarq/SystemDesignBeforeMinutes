@@ -36,13 +36,22 @@ Scale everything up so that 1 ns becomes 1 second:
 
 That is why caching works, and why a chatty service that calls another region ten times per request feels painfully slow.
 
+> [!REAL] Fetching sugar
+> Reading from memory is taking sugar from the jar on the kitchen counter. Reading from SSD is walking to the store room. A network call inside the data centre is popping to the neighbour's house. A call to another continent is ordering sugar by post from abroad. That's why you cache.
+
 ## Lessons that fall out of these numbers
 
 ### 1. Memory is far faster than disk
 Reading from RAM is roughly 1,000× faster than an SSD random read and 100,000× faster than an HDD seek. This is the entire justification for caches like Redis and for keeping hot indexes in memory.
 
+> [!REAL] Why Redis exists
+> A Flipkart product page that reads price and stock from Redis (memory) answers in about 1 ms; the same read from a disk-backed database under load can take 10–20 ms. Over 30 lookups per page, that's the difference between a snappy page and a sluggish one.
+
 ### 2. Sequential beats random
 A disk reading sequentially is many times faster than one jumping around. Databases exploit this with **write-ahead logs** and **log-structured storage** (LSM trees), which turn random writes into sequential appends. Kafka's speed comes from the same idea. See [How Databases Store Data on Disk](#/l/03-databases/storage-engines).
+
+> [!REAL] Reading a novel vs a dictionary
+> Reading a novel page by page is fast. Looking up 500 random words in a dictionary means flipping back and forth. Kafka is fast because it only appends to the end of a file and reads it front to back.
 
 ### 3. Network calls are expensive, cross-region calls more so
 A call inside a data centre costs ~0.5 ms. A call to another region costs 50–100× more. Design rules that follow:
@@ -50,11 +59,20 @@ A call inside a data centre costs ~0.5 ms. A call to another region costs 50–1
 - Avoid synchronous cross-region calls on the request path.
 - Put data close to users (CDNs, regional replicas).
 
+> [!REAL] The 40-call page
+> If a page makes 40 service calls one after another at 5 ms each, the user waits 200 ms before anything else happens. Batch them, run them in parallel, or put the services in the same region.
+
 ### 4. The speed of light is a hard limit
 Light in fibre travels about 200,000 km/s, so a 10,000 km trip takes at least 50 ms one way. No amount of engineering removes that. If a user in Mumbai talks to a server in Virginia, every round trip costs ~200 ms before your code runs at all. A TLS handshake plus the request can take three or four round trips.
 
+> [!REAL] Mumbai to New York
+> Mumbai to New York is ~12,500 km; light in fibre needs ~60 ms one way, ~120 ms there and back, before any server work. That's why Netflix, Google and others put servers inside Indian ISPs instead of serving India from the US.
+
 ### 5. Compression is cheap
 Compressing data costs microseconds; sending it across a network costs milliseconds. Compressing before sending is almost always worth it.
+
+> [!REAL] Vacuum-packed luggage
+> Vacuum-packing clothes takes a minute but saves a whole suitcase. Gzip/Brotli on a 500 KB JSON response takes microseconds and can shrink it to ~80 KB, which matters a lot on a 4G connection.
 
 ## Using these numbers in an interview
 

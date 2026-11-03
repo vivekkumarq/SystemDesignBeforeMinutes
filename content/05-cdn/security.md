@@ -7,11 +7,20 @@ A distributed denial-of-service attack floods you with traffic from many machine
 - **Network-layer (L3/L4) floods** (SYN floods, UDP amplification) are absorbed by the CDN's huge total capacity, spread across hundreds of PoPs by anycast. No single origin could absorb a multi-terabit attack; a large CDN can.
 - **Application-layer (L7) floods** (millions of legitimate-looking HTTP requests) are handled with rate limiting, bot detection, challenges and caching (cached responses cost the origin nothing).
 
+> [!REAL] A flood at the gate
+> A DDoS attack is like a thousand people blocking a shop's entrance so real customers can't get in. A CDN spreads the crowd across hundreds of locations and turns away the fakes. In 2023, Cloudflare and Google reported absorbing attacks of hundreds of millions of requests per second.
+
 ### Web Application Firewall (WAF)
 Inspects HTTP requests and blocks common attacks before they reach your servers: SQL injection, cross-site scripting, path traversal, known exploit signatures. Managed rule sets are updated as new vulnerabilities appear, giving you **virtual patching** while you fix the application.
 
+> [!REAL] The security guard who checks bags
+> A WAF looks inside each request for known attack patterns like SQL injection (`' OR 1=1 --`) and blocks it before it reaches your servers.
+
 ### Bot management
 Distinguishes humans, good bots (search crawlers) and bad bots (scrapers, credential stuffing, inventory hoarding during sales) using fingerprints, behaviour and challenges.
+
+> [!REAL] Tatkal ticket bots
+> Scripts that grab Tatkal tickets or sneakers in seconds look like users but behave like machines. Bot management spots that behaviour and challenges or blocks it.
 
 ### Rate limiting
 Limits per IP, per API key or per path (e.g. 5 login attempts per minute) at the edge, so abusive traffic never consumes origin resources.
@@ -36,11 +45,20 @@ For paid or private content (videos, downloads, documents), the application issu
 https://cdn.example.com/videos/ep1/720p.m3u8?expires=1767225600&sig=7c1e…
 ```
 
+> [!REAL] A movie ticket with your seat and time
+> A signed URL is like a ticket that works only for one movie, one show time and expires afterwards. Udemy and Netflix use signed URLs so a copied video link stops working.
+
 ### Hotlink protection
 Block other websites from embedding your images and making you pay for their bandwidth, by checking the `Referer` or requiring signed URLs.
 
+> [!REAL] Someone else using your water tap
+> Another site embeds your images directly, and you pay the bandwidth. Hotlink protection refuses requests whose `Referer` isn't your own site.
+
 ### Geo-restrictions
 Block or allow countries for licensing or legal reasons.
+
+> [!REAL] Matches available only in some countries
+> A cricket match may stream on Hotstar in India but be licensed to a different broadcaster abroad. The CDN checks the viewer's country and blocks unlicensed regions.
 
 ## Configuration risks
 
@@ -65,6 +83,9 @@ The CDN can fail too. Large CDN outages have taken down major parts of the web a
 
 > [!INTERVIEW] Edge security in a design
 > "Everything public goes through the CDN with WAF managed rules and per-IP rate limits on login and search. The origin load balancer only accepts CDN IP ranges plus a shared secret header. Paid videos use signed URLs that expire after two hours. If the origin fails, the edge serves stale catalogue pages for up to an hour."
+
+> [!REAL] When the CDN itself goes down
+> In June 2021, a bug at Fastly briefly took down sites including Amazon, Reddit and the UK government's website. Critical sites keep a second CDN or a way to bypass it.
 
 ## Key takeaways
 

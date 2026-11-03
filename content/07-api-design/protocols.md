@@ -9,6 +9,9 @@ The caller sends a request and waits for the answer.
 - **Cons:** **temporal coupling**: if the callee is slow or down, the caller is slow or fails too. Latency adds up along call chains, and availability multiplies down (see [High Availability](#/l/02-scalability/availability)).
 - **Use for:** queries the user is waiting for, and operations that need an immediate answer ("is this card valid?").
 
+> [!REAL] A phone call
+> You call and wait on the line until you get an answer. If the other person is slow, you're stuck holding the phone.
+
 ### Asynchronous (messaging / events)
 The caller publishes a message and moves on; a consumer processes it later.
 
@@ -28,6 +31,9 @@ flowchart LR
     Q --> D2[Inventory]
   end
 ```
+
+> [!REAL] A WhatsApp message
+> You send a message and get on with your day; the reply comes when it comes. Services that talk via queues work the same way.
 
 ## Communication patterns
 
@@ -50,19 +56,31 @@ How does the server tell the client something changed?
 The client asks every N seconds: "anything new?"
 - Simple, works everywhere; wasteful (most responses are empty) and adds up to N seconds of delay.
 
+> [!REAL] "Are we there yet?"
+> A child asks every minute, "Are we there yet?" Most answers are "no", and each question costs effort. Short polling is checking the server every few seconds.
+
 ### Long polling
 The client asks; the server **holds** the request open until there is data or a timeout, then the client immediately asks again.
 - Near-real-time with plain HTTP; each update still costs a new request; holding many open requests needs an async server.
+
+> [!REAL] "Tell me when we're there"
+> The child asks once and the parent answers only when they arrive (or after a while, "not yet, ask again"). Fewer wasted questions.
 
 ### Server-Sent Events (SSE)
 One long-lived HTTP response through which the server streams events.
 - Simple, automatic reconnection, works through most proxies; **one direction only** (server → client); text only.
 - Great for notifications, live feeds, progress updates and streaming AI responses.
 
+> [!REAL] A live cricket commentary feed
+> The server keeps talking and you just listen: score updates, ball by ball. One direction, server to client. Good for live scores and notifications.
+
 ### WebSocket
 A full-duplex, persistent connection upgraded from HTTP.
 - Low-latency messages in both directions; ideal for chat, multiplayer, collaborative editing, trading UIs.
 - Stateful connections complicate scaling: you need connection-aware routing, a way to deliver a message to whichever server holds the recipient's connection (pub/sub between servers), heartbeats, and reconnection with resume.
+
+> [!REAL] A phone call that stays open
+> Both sides can talk at any time on the same open line. Chat apps, multiplayer games and collaborative editors use WebSockets.
 
 ### Webhooks
 Server-to-server push: when something happens, your server POSTs to a URL the other party registered.
@@ -78,6 +96,9 @@ Server-to-server push: when something happens, your server POSTs to a URL the ot
 | Webhook | Server → server | Low | Low | Integrations between systems |
 
 See also [Short Polling vs Long Polling vs Webhooks](#/l/09-tradeoffs/polling-vs-webhooks).
+
+> [!REAL] "Call me when it's ready"
+> You leave your number at the tailor and he calls when the suit is ready. Razorpay calls your server's webhook URL when a payment succeeds, instead of you asking every few seconds.
 
 ## Protocol choices between services
 

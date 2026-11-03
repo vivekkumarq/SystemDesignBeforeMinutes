@@ -21,6 +21,9 @@ GET /v1/users/42/orders?limit=10
 - No built-in schema or type contract (OpenAPI adds one).
 - JSON is verbose; no native streaming.
 
+> [!REAL] Ordering from a fixed menu
+> REST is like a restaurant menu: `/orders`, `/orders/42`, `/menu`. Simple and universal, but you may need several dishes (calls) to get a full meal.
+
 ## GraphQL
 
 A single endpoint where the client sends a **query describing exactly the data it wants**, following a typed schema.
@@ -46,6 +49,9 @@ query {
 - **Expensive queries:** clients can request deeply nested data. You need depth limits, cost analysis and timeouts.
 - More complex server, error handling (partial results with an `errors` array and HTTP 200), and monitoring per field.
 
+> [!REAL] A thali you build yourself
+> GraphQL lets the client say exactly what it wants on the plate: "order 42's items and the rider's name, nothing else". Facebook built it for mobile apps that needed to fetch exactly the right data in one round trip.
+
 ## gRPC
 
 Remote procedure calls over **HTTP/2** using **Protocol Buffers** for compact binary messages and a contract defined in `.proto` files.
@@ -69,6 +75,9 @@ message GetOrderRequest { int64 id = 1; }
 - Binary payloads are not human-readable; debugging needs tools.
 - Less friendly for public third-party APIs.
 - Requires HTTP/2 end to end; some proxies and load balancers need configuration to balance per request.
+
+> [!REAL] The kitchen intercom
+> Inside the restaurant, staff don't fill out forms; they use a quick, strict intercom protocol. gRPC is that intercom between services: fast, binary and strongly typed. Google built it from its internal RPC system.
 
 ## Side by side
 
@@ -104,6 +113,9 @@ flowchart LR
 
 > [!INTERVIEW] Avoid tribalism
 > "We expose REST to partners because it's universal and cacheable. Our own apps use a GraphQL BFF so each screen gets its data in one round trip. Behind that, services talk gRPC for low latency and strict contracts, with deadlines propagated on every call."
+
+> [!REAL] Who is calling?
+> Public partners integrating with your API: REST. Your own mobile app with complex screens: GraphQL. Service-to-service calls inside the data centre: gRPC.
 
 ## Key takeaways
 

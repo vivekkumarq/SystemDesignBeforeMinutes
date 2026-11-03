@@ -18,6 +18,9 @@
 - **Permissions and security:** revoking access must take effect immediately.
 - **Coordination:** leader election, locks, configuration.
 
+> [!REAL] The last seat on a flight
+> Two people can't both get seat 14C. Inventory, bookings and bank balances need strong consistency.
+
 ## Eventual consistency is fine for
 
 - Like, view and follower counts.
@@ -25,6 +28,9 @@
 - Product reviews, recommendations, search indexes.
 - Analytics, logs, metrics.
 - Presence ("online" status), "last seen".
+
+> [!REAL] Like counts and follower numbers
+> If your Instagram post shows 1,203 likes on one phone and 1,205 on another for a few seconds, nobody is hurt. Counts, feeds and recommendations are fine with eventual consistency.
 
 ## The useful middle ground
 
@@ -35,6 +41,9 @@ Pure strong vs pure eventual is a false choice. These models fix the anomalies u
 - **Consistent prefix:** you never see an answer before its question (keep causally related writes in one partition).
 - **Causal consistency:** operations that depend on each other are seen in order by everyone.
 - **Bounded staleness:** reads are at most N seconds or N versions behind.
+
+> [!REAL] Read your own writes
+> After you change your profile picture, *you* must see the new one immediately, even if your friends see it a few seconds later.
 
 ## Tuning in practice
 

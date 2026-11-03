@@ -27,6 +27,9 @@ sequenceDiagram
 
 In practice the resolver almost always has the root and TLD answers cached, so a typical uncached lookup takes one or two round trips, and cached lookups take essentially none.
 
+> [!REAL] Asking for directions
+> You ask the neighbourhood shopkeeper (resolver). He doesn't know, so he asks the main road's traffic police (root), who points to the area's police station (.com), who points to the building's guard (the authoritative server), who finally gives the flat number (IP).
+
 ## Record types worth knowing
 
 | Record | Maps | Example |
@@ -55,6 +58,9 @@ Practical habits:
 - **Before a planned migration, lower the TTL a day or two in advance**, so the old long TTL has expired everywhere when you switch.
 - Some resolvers and clients ignore low TTLs and cache longer. Never rely on DNS alone for instant failover.
 
+> [!REAL] How long people remember your new number
+> If you change your phone number, friends who saved the old one keep calling it until they update. A long DNS TTL is like friends who rarely check for changes: fewer lookups, but slow to learn about a move.
+
 ## DNS as a traffic router
 
 Authoritative DNS can return **different answers to different users**. That turns DNS into the first layer of global load balancing.
@@ -65,13 +71,22 @@ Return several IPs, rotating their order. Spreads load crudely; no awareness of 
 ### Weighted routing
 Return IP A 90% of the time and IP B 10%. Useful for gradual migrations and canaries between regions.
 
+> [!REAL] Sending 10% to the new branch
+> A bank opens a new branch and sends 10% of customers there to test it before sending more. Weighted DNS does the same for a new data centre.
+
 ### Geolocation / latency-based routing (GeoDNS)
 Answer based on where the query comes from: users in India get the Mumbai region, users in Europe get Frankfurt. Latency-based routing uses measured latency rather than geography.
 
 - The authoritative server usually sees the **resolver's** IP, not the user's. A user on a distant public resolver might be routed badly. **EDNS Client Subnet (ECS)** passes a truncated client subnet to fix this.
 
+> [!REAL] The nearest Domino's
+> Calling the Domino's number connects you to the nearest outlet. GeoDNS gives Indian users the Mumbai IP and European users the Frankfurt IP for the same domain.
+
 ### Health-checked failover
 The DNS provider health-checks your endpoints and stops returning the IP of a failed region. Failover speed is bounded by TTLs and resolver behaviour (often a minute or a few minutes).
+
+> [!REAL] Diverted flights
+> When fog closes Delhi airport, flights are diverted to Jaipur. When health checks fail in one region, DNS starts answering with the other region's IP.
 
 ### Anycast for DNS itself
 Major DNS providers announce the same name-server IPs from many locations, so queries reach the nearest server and survive the loss of any single site.

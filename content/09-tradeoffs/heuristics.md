@@ -8,6 +8,9 @@ Trade-off questions don't have a right answer to memorise. They test whether you
 4. **Choose, and say what you're sacrificing.** "I'll accept up to five seconds of staleness in exchange for serving reads from regional replicas."
 5. **Say when you'd revisit.** "If write volume passes ~10K/s, we'd shard."
 
+> [!REAL] Buying a car
+> "Which car is best?" has no answer. "Best for a family of five on a ₹10 lakh budget with city driving" has one. Every trade-off question works the same way: state the requirement, then the choice follows.
+
 ## Rules of thumb
 
 ### Data

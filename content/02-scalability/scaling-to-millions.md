@@ -11,11 +11,17 @@ Web server, application and database all on one machine. It is cheap and simple,
 
 **Breaks when:** the app and the database fight over CPU and memory, and any crash takes everything down.
 
+> [!REAL] A home kitchen
+> A home baker takes orders on WhatsApp, bakes and delivers alone. Perfect for 20 orders a week. Most startups begin exactly here, and should.
+
 ## Stage 2: separate the database (≈ 1K – 10K)
 
 Move the database to its own machine. Now the web tier and the data tier can be sized independently, and you can scale each vertically.
 
 **Breaks when:** one web server cannot keep up, or it fails and the site goes down.
+
+> [!REAL] Renting a separate store room
+> The baker moves supplies into a separate store room so the kitchen has space. The app server and the database can now grow independently.
 
 ## Stage 3: load balancer + several web servers (≈ 10K – 100K)
 
@@ -31,6 +37,9 @@ flowchart LR
 Make the web tier **stateless** (sessions in Redis or tokens), then run several servers behind a load balancer. You get capacity and redundancy.
 
 **Breaks when:** the single database becomes the bottleneck, mostly with reads.
+
+> [!REAL] Hiring more bakers
+> Several bakers work in parallel and an order desk hands each order to whoever is free.
 
 ## Stage 4: replicas and a cache (≈ 100K – 1M)
 
@@ -51,10 +60,16 @@ flowchart LR
 
 **Watch out for:** replication lag. A user who updates their profile and immediately reloads might read an old replica. Fix with read-your-own-writes (read from the primary for a few seconds after a write, or for that user's own data).
 
+> [!REAL] A display counter
+> The most popular cakes sit ready in a display counter (cache), so most customers are served without going to the kitchen at all.
+
 ## Stage 5: CDN and object storage (≈ 1M+)
 
 - Static assets (JS, CSS, images, video) move to **object storage** and are served through a **CDN**. Your servers stop shipping bytes and focus on dynamic requests.
 - Users far away get fast responses from a nearby edge.
+
+> [!REAL] Franchise outlets
+> Ready-made products are stocked at outlets across the city (CDN), so customers don't travel to the main bakery.
 
 ## Stage 6: asynchronous work with queues
 
@@ -64,11 +79,17 @@ Anything that does not need to finish before the response (emails, image process
 - Spikes are absorbed by the queue instead of overwhelming downstream systems.
 - Workers scale independently.
 
+> [!REAL] Pre-orders for weddings
+> Big wedding orders go into a queue and are baked overnight, so walk-in customers aren't kept waiting.
+
 ## Stage 7: multiple data centres / regions (≈ 10M+)
 
 - Run in several availability zones from early on; add a second **region** for disaster recovery and lower latency for distant users.
 - GeoDNS or anycast send users to the nearest healthy region.
 - The hard part is data: cross-region replication, deciding which data is global and which is regional, and handling conflicts.
+
+> [!REAL] A second factory in another state
+> If a flood hits one factory, the other keeps supplying the country.
 
 ## Stage 8: scale the data tier horizontally
 
@@ -77,11 +98,17 @@ When writes or data volume outgrow one primary:
 - **Sharding:** split a big table across many databases by a key such as user ID. See [Sharding](#/l/03-databases/sharding).
 - **NoSQL where it fits:** wide-column or key-value stores for very high write volume with simple access patterns.
 
+> [!REAL] Regional warehouses
+> Stock records are split by region, so no single warehouse ledger has to track the whole country.
+
 ## Stage 9: services, observability and automation
 
 - Split the monolith along team and domain boundaries when the codebase and teams get too big to move fast together, not before.
 - **Observability:** metrics, logs and traces are mandatory at this size.
 - **Automation:** autoscaling, infrastructure as code, CI/CD with canary deploys.
+
+> [!REAL] Departments and dashboards
+> The company now has separate teams (services) for orders, delivery and payments, each with its own dashboard and on-call rota.
 
 ## The whole picture
 

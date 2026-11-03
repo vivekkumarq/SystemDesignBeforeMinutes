@@ -22,6 +22,9 @@ Inverted index
 
 A search for `waterproof hiking` intersects `[1, 3]` and `[1, 3]` → documents 1 and 3, without scanning anything else. Each list also stores positions (for phrase queries) and frequencies (for scoring).
 
+> [!REAL] The index at the back of a cookbook
+> The cookbook's index lists "paneer → pages 12, 48, 97". You don't scan every recipe for the word "paneer". Elasticsearch builds that list for every word in every document.
+
 ## Analysis: turning text into terms
 
 Before indexing, text passes through an **analyzer**:
@@ -31,6 +34,9 @@ Before indexing, text passes through an **analyzer**:
 
 The same analysis runs on the search query, so "Running Shoes" matches "run shoe". Choosing analyzers per language and field is a big part of search quality.
 
+> [!REAL] Searching "running shoes"
+> A user types "Running Shoes". The analyzer lowercases it and reduces "running" to "run", so it matches a product titled "Shoes for runners". Flipkart and Amazon search depend on this step.
+
 ## Relevance scoring
 
 Results are ranked, usually with **BM25**, a refinement of TF-IDF:
@@ -39,6 +45,9 @@ Results are ranked, usually with **BM25**, a refinement of TF-IDF:
 - **Field length:** a match in a short title counts more than in a long description.
 
 Teams then add business signals: boosts for in-stock items, popularity, recency, personalisation.
+
+> [!REAL] Which result comes first
+> A product with "iPhone" in its title should rank above one that mentions "iPhone" once in a long description. Scoring formulas like BM25 do exactly that.
 
 ## Architecture
 
@@ -61,6 +70,9 @@ flowchart TB
 ### Near-real-time, not real-time
 New documents go to an in-memory buffer and become searchable when a **refresh** writes them into a new immutable **segment** (by default about once a second). Segments are merged in the background, much like LSM compaction. Durability comes from a transaction log. So a document you just indexed may not appear in search for up to a second.
 
+> [!REAL] The new product that shows up a second later
+> A seller lists a product and it appears in search about a second later, not instantly. That small delay is the refresh interval, and it's normal.
+
 ## Using it in a system
 
 Elasticsearch is almost never the **source of truth**. The usual pattern:
@@ -78,6 +90,9 @@ flowchart LR
 - Changes flow through a queue or CDC pipeline to an indexer that updates Elasticsearch.
 - Search reads from Elasticsearch, then often fetches authoritative details (price, stock) from the database or cache.
 - If the index is lost or corrupted, rebuild it from the database.
+
+> [!REAL] Search beside the database
+> Swiggy keeps the source of truth for restaurants in its main database and copies it into a search engine for "biryani near me". If the search index is lost, it can be rebuilt from the database.
 
 ## What it is good at
 

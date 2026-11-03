@@ -20,6 +20,9 @@
 - Queries are **varied or not yet known** (reporting, admin tools, new features).
 - Data volume fits one primary (plus replicas) for the foreseeable future. Most products are in this category for longer than people expect.
 
+> [!REAL] The bank ledger
+> Money, bookings and inventory need joins, constraints and transactions. That's why core banking and payment ledgers almost always sit on relational databases.
+
 ## Choose NoSQL when
 
 - **Huge write volume** or data size beyond one machine, with a simple key-based access pattern (chat messages, events, IoT readings).
@@ -28,6 +31,9 @@
 - **Low-latency key lookups** at scale: sessions, carts, feature flags.
 - **Relationship-heavy traversals** (graph databases).
 - Built-in **multi-region replication** and high availability matter more than strict consistency.
+
+> [!REAL] The chat history
+> Billions of chat messages written per day, always read by conversation ID: that's a key-based access pattern at a huge scale, where Cassandra-style stores shine.
 
 ## Common mistakes
 
@@ -48,6 +54,9 @@ flowchart LR
 
 > [!INTERVIEW] How to answer
 > "Orders and payments go in PostgreSQL: they're relational and need multi-row transactions. The activity feed is write-heavy, append-only and always read by user and time, so it goes in Cassandra partitioned by user ID. If I had to pick only one to start, PostgreSQL. It covers both well at our current scale."
+
+> [!REAL] Using the right tool for each job
+> A typical large app keeps orders and payments in PostgreSQL or MySQL, sessions and counters in Redis, product search in Elasticsearch and analytics in a data warehouse. Most big companies use several databases.
 
 ## Key takeaways
 

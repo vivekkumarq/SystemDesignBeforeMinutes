@@ -15,6 +15,9 @@ A cache with perfect eviction but no invalidation is fast and wrong. A cache wit
 ### TTL is the bridge
 A TTL is an invalidation mechanism (bounds staleness) that also frees memory (helps eviction). In Redis, the `volatile-*` eviction policies only consider keys that have a TTL, which lets you mark which keys are disposable.
 
+> [!REAL] Best-before dates
+> Eviction is throwing things out when the fridge is full; invalidation is throwing out what you know has gone bad. A best-before date (TTL) covers what you forgot about.
+
 ### Lifecycle of a cached item
 
 ```mermaid
@@ -51,8 +54,14 @@ Store a "soft" expiry inside the value and a longer "hard" TTL on the key.
 
 Users never wait for a reload, and the database sees one refresh per key instead of a stampede. HTTP has the same idea built in: `Cache-Control: max-age=60, stale-while-revalidate=300`.
 
+> [!REAL] Serving yesterday's newspaper while today's arrives
+> The tea stall keeps yesterday's paper on the counter until today's arrives, rather than leaving the rack empty. Users get a slightly old answer instantly while a fresh one is fetched in the background.
+
 ### 5. Negative caching with short TTLs
 Cache "not found" results for a short time (e.g. 30–60 seconds) to stop repeated lookups for missing keys from hitting the database. Invalidate (or keep the TTL short) so a newly created item becomes visible quickly. See [Stampedes, Penetration & Hot Keys](#/l/04-caching/challenges).
+
+> [!REAL] "Out of stock" sign
+> The shopkeeper puts up "No sugar today" so he doesn't have to check the store room for every customer. Caching "not found" for a short time protects the database from repeated misses.
 
 ## Sizing: when eviction should be rare
 

@@ -20,6 +20,9 @@ sequenceDiagram
   C-->>S: 200 OK
 ```
 
+> [!REAL] Checking for a parcel vs a doorbell
+> Polling is opening the door every 10 minutes to see if the parcel has arrived. A webhook is the doorbell: the courier tells you when it's there.
+
 ## Side by side
 
 | | Short polling | Long polling | Webhooks |
@@ -56,6 +59,9 @@ Use backoff (poll less often when nothing changes) and conditional requests (`ET
 - **Be idempotent:** providers retry, so dedupe by event ID.
 - **Don't assume order:** check event timestamps or fetch the current state from the provider's API.
 - **Reconcile:** periodically poll the provider's API for anything you missed (webhooks can be lost).
+
+> [!REAL] Signing for the parcel
+> Check the courier's ID (verify the signature), sign quickly (return 200 fast and process later), and don't panic if the same parcel is delivered twice (handle duplicates idempotently).
 
 ### Sending webhooks well (if you're the provider)
 - Retries with exponential backoff for hours or days; a dashboard showing delivery attempts; a way for customers to replay events; signatures; event IDs; versioned payloads.

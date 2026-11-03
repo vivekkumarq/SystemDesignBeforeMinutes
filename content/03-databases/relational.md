@@ -37,6 +37,9 @@ erDiagram
 - **Foreign key (FK):** a column that refers to a row in another table. The database can enforce that it points at something real.
 - **Constraints:** `NOT NULL`, `UNIQUE`, `CHECK (quantity > 0)` and so on. The database guards integrity so every application does not have to.
 
+> [!REAL] School records
+> Students, Classes and Enrolments are three tables. Instead of copying a student's address into every class they join, you store it once and point to it with a student ID. Change the address once and it's correct everywhere.
+
 ## Normalisation
 
 Normalisation means storing each fact **once** and referencing it elsewhere.
@@ -50,8 +53,14 @@ The usual normal forms in plain words:
 - **2NF:** every non-key column depends on the *whole* primary key, not part of it.
 - **3NF:** non-key columns depend only on the key, not on other non-key columns (store `zip_code`, not `zip_code` *and* `city` derived from it, unless you accept the duplication).
 
+> [!REAL] Your address on every form
+> If your address is written on 30 different forms and you move house, you have to update 30 forms and you'll miss one. Normalisation stores it once.
+
 ### Denormalisation
 Sometimes you deliberately duplicate data to avoid expensive joins on hot read paths: a `comment_count` column on posts, or the author's name copied onto each post for a feed. You trade write complexity and the risk of inconsistency for read speed. It is a legitimate optimisation, but make it a conscious choice.
+
+> [!REAL] The order receipt
+> An Amazon order stores a copy of the delivery address and price *at the time of purchase*, even though they also live in other tables. That's deliberate denormalisation: the receipt mustn't change if you edit your address later.
 
 ## Joins
 
@@ -67,6 +76,9 @@ LIMIT 20;
 ```
 
 Joins are what make the relational model so flexible: you can ask new questions without changing how the data is stored. They are cheap on indexed columns within one database, and **painful across shards**, which is a big reason sharding relational data is hard.
+
+> [!REAL] Matching two lists
+> A teacher with a roll-number list and a marks list combines them by roll number to make the report card. A JOIN does that matching for you.
 
 ## Strengths
 
@@ -91,6 +103,9 @@ Joins are what make the relational model so flexible: you can ask new questions 
 
 > [!INTERVIEW] A good default
 > "I'll start with PostgreSQL for orders and payments because we need transactions across the order, its items and the inventory reservation, and the data is clearly relational. At our estimated 2K writes per second a single primary with replicas is comfortable. If we outgrow it, we shard by customer ID since nearly all queries are per customer."
+
+> [!REAL] Banks, airlines and HR
+> Your bank balance, an IndiGo seat booking and your salary slip all need strict rules and transactions. That's why almost every bank and airline core system is relational.
 
 ### Distributed SQL
 Products such as Google Spanner, CockroachDB and YugabyteDB keep SQL and ACID transactions but shard and replicate automatically, using consensus. They cost more latency per write and more money, but remove a lot of manual sharding work. Worth mentioning when an interviewer wants both relational guarantees and global scale.

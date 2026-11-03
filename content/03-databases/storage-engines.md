@@ -10,6 +10,9 @@ Append every write to the end of a file: `key,value`. Writes are sequential and 
 
 The two main engines both build on this idea in different directions.
 
+> [!REAL] The bank passbook
+> A passbook never erases a line; it just adds the next transaction at the bottom. Writing is fast. Finding your balance means reading from the top, unless you keep an index.
+
 ## B-trees: update in place
 
 The data lives in fixed-size **pages** (typically 4–16 KB) arranged as a balanced tree. To write, find the right leaf page and modify it in place.
@@ -30,6 +33,9 @@ flowchart TB
 **Weaknesses:** random writes to pages all over the disk; **write amplification** (changing one small row rewrites a whole page, plus the WAL); pages fragment over time.
 
 **Used by:** PostgreSQL, MySQL InnoDB, Oracle, SQL Server, most relational databases.
+
+> [!REAL] A register with pencil entries
+> Each record has a fixed place in the register, and you rub it out and rewrite it on change. Reads are quick because you know where to look. PostgreSQL and MySQL work this way.
 
 ## LSM trees: append, then merge
 
@@ -58,6 +64,9 @@ flowchart LR
 
 **Used by:** Cassandra, ScyllaDB, HBase, RocksDB, LevelDB, Bigtable, and as an option in MySQL (MyRocks).
 
+> [!REAL] Sticky notes, then a clean copy
+> You jot changes on sticky notes all day (fast), and at night merge them into a neat notebook (compaction). Cassandra, RocksDB and many write-heavy systems use LSM trees.
+
 ## Comparison
 
 | | B-tree | LSM tree |
@@ -82,6 +91,9 @@ Another layout choice, independent of the above:
 | Workload | Transactions (OLTP) | Analytics (OLAP) |
 | Reads | Whole rows | A few columns across many rows |
 | Examples | PostgreSQL, MySQL | ClickHouse, BigQuery, Snowflake, Redshift, Parquet files |
+
+> [!REAL] Reading a whole form vs one column
+> To print a customer's full profile you want the whole row. To compute "average order value across 1 billion orders" you only want one column. Analytics warehouses like BigQuery and Redshift store columns together for that reason.
 
 ## Key takeaways
 

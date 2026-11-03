@@ -18,6 +18,9 @@ hash   mod 4   mod 5
 
 Going from N to N+1 servers moves roughly **N/(N+1)** of all keys: about 80% here, about 99% at 100 servers. For a cache, that means almost everything misses at once and the database is flooded. For a database, it means moving almost all the data.
 
+> [!REAL] Renumbering every seat
+> If a cinema renumbers *every* seat when one extra row is added, everyone has to move. With `hash % N`, changing N from 4 to 5 moves almost every key, so your cache is suddenly empty.
+
 ## The hash ring
 
 Consistent hashing places **both servers and keys** on the same circular hash space, say 0 to 2³²−1.
@@ -37,6 +40,9 @@ flowchart LR
   end
 ```
 
+> [!REAL] Delivery zones on a circular road
+> Imagine houses on a ring road, each served by the next depot clockwise. Add a new depot and only the houses between it and the previous depot change depot; everyone else is untouched.
+
 ### Adding a server
 A new server D lands between C and A on the ring. Only the keys between C and D, which used to go to A, now go to D. **Everything else stays put.** On average just 1/N of the keys move.
 
@@ -52,6 +58,9 @@ With only a few servers, their random positions on the ring leave very uneven ar
 - Load evens out, because each server owns many small arcs spread around the ring.
 - When a server fails, its arcs are scattered, so its load spreads across **all** remaining servers.
 - Heterogeneous hardware: give a bigger server more virtual nodes.
+
+> [!REAL] Each depot runs several counters around the ring
+> Instead of one spot on the ring, each server takes 100–200 spots scattered around it. Load evens out, and a bigger server can simply take more spots.
 
 ## Lookup in code
 
@@ -99,6 +108,9 @@ To store each key on R servers, walk clockwise from the key and take the first R
 - **Distributed databases:** Cassandra, ScyllaDB, DynamoDB, Riak partition data on a ring.
 - **Load balancers:** sticky routing of a user or session to a backend, with little disruption when backends change.
 - **CDNs:** choosing which edge server in a location caches which object.
+
+> [!REAL] Real systems
+> Amazon's Dynamo, Apache Cassandra and Discord's message routing all use consistent hashing. CDNs use it to decide which edge server caches which file.
 
 ## Alternatives worth knowing
 

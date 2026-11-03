@@ -14,6 +14,9 @@ Here is how you would put a CDN in front of a real application, step by step, us
 
 Classifying first prevents the classic mistakes: caching user data, or caching nothing at all.
 
+> [!REAL] Sorting the shop's stock
+> A kirana owner sorts stock into "lasts a year" (rice), "lasts a week" (bread) and "must be fresh" (milk). Product images, product pages and the cart are the same three classes for an online store.
+
 ## Step 2: Set up origins
 
 ```mermaid
@@ -51,6 +54,9 @@ flowchart LR
 
 **Cache tags (surrogate keys):** the origin labels responses (`Surrogate-Key: product-42 category-shoes`). One API call then purges every cached page that mentions product 42, without knowing their URLs.
 
+> [!REAL] Price changed during a sale
+> During Big Billion Days, a price drop must show within seconds. Versioned image files stay cached for a year, while the price comes from a short-TTL API or is purged instantly with a tag-based purge.
+
 ## Step 6: Secure it
 
 - WAF with managed rules on all routes; rate limits on `/api/login`, `/api/search`.
@@ -64,6 +70,9 @@ flowchart LR
 - Segments are immutable → long TTLs and very high hit ratios.
 - Manifests for live streams change constantly → TTL of a second or two, with request collapsing.
 - The player switches bitrate based on bandwidth (adaptive bitrate).
+
+> [!REAL] How Netflix ships movies
+> Netflix's Open Connect places its own cache servers inside ISPs, including Indian ones, and fills them overnight with the titles people are likely to watch the next day. Most viewing never crosses the open internet.
 
 ## Step 8: Observe and iterate
 

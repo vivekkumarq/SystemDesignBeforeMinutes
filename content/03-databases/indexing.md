@@ -6,6 +6,9 @@ An index is a separate data structure that lets the database find rows without r
 - **No index:** a full table scan, reading every row. Seconds to minutes.
 - **Index on `email`:** walk a tree of a few levels to the exact row. Under a millisecond.
 
+> [!REAL] The index at the back of a textbook
+> Finding "photosynthesis" without the index means reading all 400 pages. With it, you jump straight to page 212. A database index does the same for `WHERE email = ?`.
+
 ## The B-tree (B+ tree) index
 
 The default index in almost every relational database.
@@ -26,6 +29,9 @@ flowchart TB
 - Lookups, inserts and deletes are O(log n).
 
 Good for: equality, ranges, sorting, prefix matches (`LIKE 'abc%'`). Not useful for: `LIKE '%abc'` or functions applied to the column (unless you index the expression).
+
+> [!REAL] The phone directory
+> The old telephone directory had guide words at the top of each page ("Sharma – Shetty"). You open the middle, narrow down, and find the page in a few flips. A B-tree is that, in a few disk reads for millions of rows.
 
 ## Other index types
 
@@ -55,6 +61,9 @@ It does **not** help `WHERE created_at > '2026-01-01'` alone, because the index 
 
 **Column order rule of thumb:** equality columns first, then range or sort columns.
 
+> [!REAL] A directory sorted by surname, then first name
+> You can quickly find all "Sharma", or "Sharma, Rahul". You can't quickly find every "Rahul" because the directory isn't sorted by first name. That's the leftmost-prefix rule.
+
 ## Covering indexes
 
 If the index contains every column the query needs, the database answers from the index alone without touching the table ("index-only scan").
@@ -64,6 +73,9 @@ CREATE INDEX idx_orders_user ON orders (user_id, created_at) INCLUDE (status, to
 SELECT created_at, status, total FROM orders WHERE user_id = 42 ORDER BY created_at DESC LIMIT 20;
 ```
 
+> [!REAL] The answer is in the index itself
+> If you only want to know which page "photosynthesis" is on, the index alone answers you; you never open the chapter. A covering index answers the query without touching the table.
+
 ## The cost of indexes
 
 Indexes are not free:
@@ -72,6 +84,9 @@ Indexes are not free:
 - **Memory:** hot indexes need to fit in RAM to be fast.
 
 So index for the queries you actually run, and drop unused indexes. Write-heavy tables should carry only the indexes they need.
+
+> [!REAL] Updating every index in the library
+> Every new book must be added to the title catalogue, the author catalogue and the subject catalogue. More indexes mean faster searching but slower adding.
 
 ## How to find what to index
 

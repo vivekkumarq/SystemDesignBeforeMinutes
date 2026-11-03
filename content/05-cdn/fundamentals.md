@@ -8,6 +8,9 @@ Without a CDN, every request crosses the world to your origin:
 - **Bandwidth cost:** origin egress is expensive at scale.
 - **Fragility:** a traffic spike or attack hits your origin directly.
 
+> [!REAL] Mumbai to a user in Guwahati
+> If Hotstar served every video from one data centre in Mumbai, a viewer in Guwahati would wait for every chunk to cross the country, and during an India–Pakistan match the Mumbai data centre's links would melt. Edge servers in many cities serve the same chunks locally.
+
 ## How it works
 
 ```mermaid
@@ -25,6 +28,24 @@ flowchart LR
 2. **Edge cache lookup.** If the edge has the object and it is fresh (a **hit**), it responds immediately.
 3. **Miss.** The edge fetches from a mid-tier/regional cache (the **origin shield**), and only if that misses too, from the **origin**. The response is cached on the way back.
 4. **Next user** in that region gets a hit.
+
+> [!REAL] The neighbourhood ration shop
+> The government warehouse doesn't hand grain directly to every family. It stocks ration shops in each locality, and families collect from the nearest one. Only when the shop runs out does it go back to the warehouse (the origin).
+
+```mermaid
+sequenceDiagram
+  participant U as User in Patna
+  participant E as Edge server (Patna)
+  participant O as Origin (Mumbai)
+  U->>E: GET /logo.png
+  alt cached at edge
+    E-->>U: 200 in ~10 ms (HIT)
+  else first request
+    E->>O: fetch logo.png
+    O-->>E: logo.png + Cache-Control
+    E-->>U: 200 in ~60 ms (MISS, now cached)
+  end
+```
 
 ### Key vocabulary
 - **PoP (point of presence):** a CDN data centre in a city, containing many edge servers.
@@ -45,6 +66,9 @@ flowchart LR
 | Best for | Websites, APIs, most traffic | Large, predictable files: software releases, video libraries |
 
 Most CDN use today is pull-based, often with the origin being an object-storage bucket.
+
+> [!REAL] Stocking the shop vs ordering on demand
+> Push: before Diwali, the company sends sweets boxes to every outlet in advance. Pull: an outlet orders a product from the warehouse only when the first customer asks for it, then keeps it on the shelf.
 
 ## What a CDN can serve
 
@@ -74,6 +98,9 @@ Most CDN use today is pull-based, often with the origin being an object-storage 
 
 > [!INTERVIEW] When to bring up a CDN
 > Any time a design serves static files, images, video or globally distributed users. "All media is stored in object storage and served through a CDN; the origin only handles API calls. With a 95% edge hit ratio, origin egress drops twentyfold."
+
+> [!REAL] What a CDN can't do
+> A CDN can cache the IPL highlights video for everyone, but it can't cache *your* order history or bank balance. Personal, per-user data still goes to the origin.
 
 ## Key takeaways
 

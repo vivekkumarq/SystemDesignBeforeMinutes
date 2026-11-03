@@ -20,6 +20,9 @@ sequenceDiagram
 - Data can be stale until TTL or invalidation.
 - App code stays clean; loading logic is centralised (and can coalesce concurrent misses).
 
+> [!REAL] The librarian fetches it
+> You ask the librarian; if the book isn't at the desk, she fetches it from the stacks and keeps a copy at the desk.
+
 ## Write-through
 
 On a write, the value is written to the cache **and** the database synchronously before the write is acknowledged.
@@ -39,6 +42,9 @@ sequenceDiagram
 - Each write pays cache + database latency.
 - Cache fills with written data even if nobody reads it (use TTLs).
 - On its own it doesn't help keys that were never written through the cache, so it's usually combined with read-through or cache-aside.
+
+> [!REAL] Updating the desk and the stacks together
+> Whenever a book is returned, the librarian updates both the desk copy and the stacks record before saying "done".
 
 ## Side by side
 

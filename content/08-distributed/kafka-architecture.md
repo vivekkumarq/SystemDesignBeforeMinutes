@@ -24,6 +24,9 @@ flowchart LR
 - **Producer:** writes records to topics.
 - **Consumer:** reads records; consumers are organised into **consumer groups**.
 
+> [!REAL] A newspaper archive
+> A topic is a newspaper; each issue is appended to the archive and never edited. Readers (consumers) keep a bookmark (offset) of the last issue they read and can go back and re-read old issues.
+
 ## Partitioning and keys
 
 The producer picks a partition for each record:
@@ -33,6 +36,9 @@ The producer picks a partition for each record:
 **Ordering is guaranteed only within a partition**, not across a topic. Choose the key by the ordering you need: events for one order, one user or one account.
 
 Watch for **hot partitions**: a key with huge volume (a celebrity, a large tenant) overloads one partition. Use a more granular key or add a suffix to spread it.
+
+> [!REAL] Billing counters by surname
+> A topic split into partitions is like a bank with counters A–H, I–P, Q–Z. Everyone named Sharma always goes to the same counter, so their transactions are processed in order.
 
 ## Consumer groups
 
@@ -49,6 +55,9 @@ Topic with 6 partitions, group with 3 consumers:
 
 When consumers join or leave, partitions are reassigned. See [Kafka Consumer Rebalancing](#/l/08-distributed/kafka-rebalancing).
 
+> [!REAL] Two teams reading the same files
+> The fraud team and the analytics team both read every order event, each at its own pace. Within the fraud team, the partitions are split among members so each event is handled once per team.
+
 ## Replication and durability
 
 - Each partition has a **replication factor** (typically 3): one **leader** replica and followers on other brokers.
@@ -64,6 +73,9 @@ When consumers join or leave, partitions are reassigned. See [Kafka Consumer Reb
 - **Zero-copy:** data is sent from the page cache to the network socket without copying through application memory.
 - **Batching and compression:** producers send batches; brokers store them compressed; consumers fetch in batches.
 - **Partitioning:** load spreads across brokers and disks.
+
+> [!REAL] Writing a diary vs filing papers
+> Kafka only appends to the end of files and reads them front to back, the fastest thing a disk can do, and sends data in big batches. LinkedIn, which created Kafka, has reported trillions of messages a day through it.
 
 ## Retention and compaction
 
@@ -90,6 +102,9 @@ Because data is retained, consumers can **replay**: rebuild a search index, back
 
 > [!INTERVIEW] Sizing a topic
 > "We expect a 30K events/s peak. If one consumer handles ~3K/s, we need at least 10 consumers, so 10 partitions minimum; I'd pick 24 for headroom, since adding partitions later changes key-to-partition mapping. Replication factor 3, `min.insync.replicas=2`, producers with `acks=all` and idempotence on. Keyed by `order_id` for per-order ordering."
+
+> [!REAL] Uber's live location stream
+> Every driver's phone sends location pings. Kafka carries them to the matching, pricing, ETA and analytics systems, each reading the same stream for its own purpose.
 
 ## Key takeaways
 

@@ -4,6 +4,9 @@
 
 A bus and a sports car travel the same road. The car gets one person there fastest (low latency). The bus moves fifty people per trip (high throughput) but you wait for it to fill and it stops often. Neither is "better"; it depends on what you're optimising.
 
+> [!REAL] A bus vs a bike
+> A bike gets one person across town in 15 minutes (low latency). A bus takes 40 minutes but moves 60 people at once (high throughput). Batching is choosing the bus.
+
 ## Where they pull against each other
 
 | Technique | Throughput | Latency |
@@ -27,8 +30,14 @@ utilisation 95% → 20×
 
 That's why latency-sensitive services run at 50–70% peak utilisation, while batch systems happily run near 100%.
 
+> [!REAL] A toll booth at 95%
+> At 50% utilisation, cars barely wait. At 95%, every small surge creates a long jam. That's why servers are run at 60–70% CPU, not 95%.
+
 ### Little's Law
 `concurrency = throughput × latency`. If a service handles 1,000 requests/s at 50 ms each, about 50 requests are in flight at any moment. Use it to size thread pools and connection pools, and to see that higher latency (e.g. a slow dependency) needs more concurrency to keep the same throughput.
+
+> [!REAL] People in a café
+> If 30 customers arrive per hour and each stays 20 minutes (⅓ hour), there are on average 10 people inside. Requests in flight = arrival rate × time each spends in the system.
 
 ## Which to optimise
 

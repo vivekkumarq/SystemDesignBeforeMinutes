@@ -14,6 +14,9 @@ These are two separate systems, so there is no transaction covering both:
 
 Wrapping it in a try/catch doesn't help, because a crash can happen between any two lines.
 
+> [!REAL] Writing in the register and sending an SMS
+> The shopkeeper writes the sale in the register and then sends the customer an SMS. If his phone dies between the two, the sale is recorded but the SMS never goes, or the SMS goes but the sale is never recorded.
+
 ## The pattern
 
 Write the event into an **outbox table in the same database**, inside the same local transaction as the business change. A separate relay then publishes outbox rows to the broker.
@@ -39,6 +42,9 @@ COMMIT;
 
 Either both rows are committed or neither is. The event can no longer be lost or invented.
 
+> [!REAL] Writing the SMS in the register too
+> He writes the sale *and* "SMS to send" in the same register entry. An assistant goes through the register and sends any SMS not yet marked sent. Nothing is lost because both are one write.
+
 ## Relaying outbox rows
 
 ### Option 1: Polling publisher
@@ -58,6 +64,9 @@ A tool such as Debezium reads the database's transaction log (PostgreSQL WAL, My
 
 - **Pros:** low latency, no polling load, preserves commit order.
 - **Cons:** more infrastructure; requires log access and careful operations.
+
+> [!REAL] Reading the CCTV instead of asking
+> Instead of checking the register every few minutes, the assistant watches the live recording of every new entry. CDC tools like Debezium read the database's change log and publish events.
 
 ## Delivery guarantees
 

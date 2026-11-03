@@ -35,6 +35,9 @@ Product get(long id) {
 - **Cons:** the first request for each key is slow (a miss costs three steps); data can be stale until TTL or invalidation; the app carries the caching logic.
 - **The default choice** for most read-heavy services.
 
+> [!REAL] Checking the fridge before going to the shop
+> You check the fridge for milk. Not there? You buy it and put some in the fridge for next time. The app checks the cache, goes to the database on a miss, then fills the cache.
+
 ### Read-through
 The application only talks to the cache. On a miss, **the cache itself** loads from the database (via a configured loader) and stores the result.
 
@@ -42,6 +45,9 @@ The application only talks to the cache. On a miss, **the cache itself** loads f
 - **Cons:** needs a cache library or product that supports loaders; same first-request penalty as cache-aside.
 
 Cache-aside and read-through behave the same from the data's point of view. The difference is *who* fetches on a miss.
+
+> [!REAL] The library's front desk
+> You ask the desk for a book; if it isn't on the shelf behind them, *they* go to the store room and fetch it. The cache itself loads from the database; the app only talks to the cache.
 
 ## Write strategies
 
@@ -63,6 +69,9 @@ sequenceDiagram
 - **Cons:** every write pays both latencies; data written but never read still fills the cache (pair it with a TTL).
 - **Use for:** data read soon after it is written, where freshness matters, e.g. user settings.
 
+> [!REAL] Writing in both diaries at once
+> Every time you note an expense, you write it in your diary and the shared family diary at the same moment. Both are always in sync, but every entry takes twice as long.
+
 ### Write-behind (write-back)
 Writes go to the cache and are acknowledged immediately; the cache flushes them to the database **asynchronously**, often batched.
 
@@ -70,12 +79,18 @@ Writes go to the cache and are acknowledged immediately; the cache flushes them 
 - **Cons:** **risk of data loss** if the cache fails before flushing; the database lags behind; harder to reason about ordering.
 - **Use for:** high-volume, loss-tolerant data: view counters, likes, analytics, game scores with periodic persistence.
 
+> [!REAL] Jotting it now, filing it tonight
+> The shopkeeper notes sales on a slate all day and copies them into the ledger at night. Fast during the day, but if the slate is wiped before then, the sales are lost.
+
 ### Write-around
 Writes go straight to the database, skipping the cache. The cache gets the data only when it is read (via cache-aside), and the old cached entry is usually **deleted** on write.
 
 - **Pros:** the cache is not flooded with data that is written but rarely read.
 - **Cons:** the first read after a write is a miss.
 - **Use for:** write-heavy data that is rarely re-read soon, such as logs, or large uploads.
+
+> [!REAL] Not shelving books nobody asked for
+> New books go straight to the store room, not the front display. They get displayed only once someone asks for them. Writes skip the cache; only reads fill it.
 
 ## Comparison
 

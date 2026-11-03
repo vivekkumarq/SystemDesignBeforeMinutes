@@ -14,6 +14,9 @@
 | Performance overhead | Very low | Higher (more logic per request) |
 | Examples | AWS NLB/ALB, HAProxy, NGINX | Kong, Apigee, AWS API Gateway, Envoy-based gateways, Spring Cloud Gateway |
 
+> [!REAL] The traffic police vs the airport security
+> A load balancer is the traffic police spreading cars across lanes. An API gateway is airport security: it checks your identity, your ticket, how many bags you have and which terminal you belong to.
+
 ## What an API gateway adds
 
 - **Single entry point** that hides the internal service layout from clients.

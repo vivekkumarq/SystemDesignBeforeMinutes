@@ -16,6 +16,9 @@ For a chat app:
 - Users see when a message was delivered and read.
 - Users see whether a contact is online.
 
+> [!REAL] Zomato in one line each
+> "Users can search restaurants", "users can place an order", "users can track the rider live", "restaurants can mark food ready". Each is a verb the user does. Reviews, offers and Zomato Gold get parked for later.
+
 ### Keep the list short
 An interview has 45 minutes. Pick the **three to five** features that define the product and explicitly park the rest:
 
@@ -38,6 +41,16 @@ Non-functional requirements (NFRs) are the qualities: speed, scale, availability
 | **Cost** | Is there a budget constraint? | Storage cost dominates; tier old data |
 | **Read/write pattern** | Read-heavy or write-heavy? | 100:1 read-heavy |
 
+> [!REAL] Same features, different promises
+> A cricket score app and a stock trading app both "show a number that changes". The score app can be a few seconds late; the trading app must be accurate to the millisecond and never show a wrong price. The features are the same; the NFRs make them completely different systems.
+
+```mermaid
+flowchart LR
+  F[Functional<br/>what users do] --> D[Design]
+  N[Non-functional<br/>scale · latency · availability · consistency] --> D
+  D --> A[Architecture choices:<br/>cache, queues, replicas, shards]
+```
+
 ## How NFRs change the design
 
 The same feature list leads to very different systems depending on the NFRs.
@@ -57,6 +70,9 @@ The same feature list leads to very different systems depending on the NFRs.
 > [!INTERVIEW] Name the tension
 > Strong interviews spot where NFRs pull against each other. "We want low latency globally *and* strong consistency on bookings. Those conflict across regions, so I'll keep bookings strongly consistent in one home region per property and accept higher latency there, while search can be served from local, eventually consistent replicas."
 
+> [!REAL] Two chat apps
+> WhatsApp must deliver every message exactly in order and never lose one, so it stores messages until they're acknowledged. A Twitch live chat with 100,000 viewers can drop messages under load, because no one reads them all anyway. Same feature, opposite designs.
+
 ## Turning vague words into numbers
 
 "Fast", "scalable" and "highly available" mean nothing until they have numbers.
@@ -69,6 +85,9 @@ The same feature list leads to very different systems depending on the NFRs.
 Two more terms worth knowing for availability discussions:
 - **RTO (Recovery Time Objective):** how long you can be down after a disaster.
 - **RPO (Recovery Point Objective):** how much recent data you can afford to lose.
+
+> [!REAL] "Fast" for Google Search
+> "Fast" for Google Search means results in a few hundred milliseconds. "Fast" for a bank statement PDF means within a minute. Always ask "how fast, at what percentile, for how many users?"
 
 ## A checklist to run through
 

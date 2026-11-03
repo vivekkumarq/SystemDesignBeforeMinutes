@@ -33,6 +33,9 @@ Return structured errors:
 { "error": { "code": "INSUFFICIENT_FUNDS", "message": "Balance too low", "requestId": "req_8f2a" } }
 ```
 
+> [!REAL] The receptionist's replies
+> 200: "here you go". 201: "created your booking". 400: "your form is filled wrong". 401: "who are you?". 403: "I know you, but you can't go in". 404: "no such person here". 429: "too many visits, wait". 500: "our mistake".
+
 ## Pagination
 
 Never return unbounded lists.
@@ -40,6 +43,9 @@ Never return unbounded lists.
 **Offset pagination** (`?page=5&size=20` / `OFFSET 80`): simple and allows jumping to a page, but slow for deep pages (the database still walks the skipped rows) and unstable when items are inserted (duplicates or skips).
 
 **Cursor (keyset) pagination** (`?after=eyJpZCI6OTgxfQ&limit=20`): the cursor encodes the last item's sort key; the query is `WHERE (created_at, id) < (?, ?) ORDER BY created_at DESC, id DESC LIMIT 20`. Constant speed at any depth and stable under inserts. The standard for feeds and large lists.
+
+> [!REAL] Search results in pages
+> Google doesn't send you a million results at once; it sends 10 and a "next" link. Cursor pagination is the "next" link that stays correct even while new items are being added.
 
 ## Filtering, sorting, sparse fields
 
@@ -60,6 +66,9 @@ Idempotency-Key: 6f1c0b8e-...
 
 The server stores the key with the outcome; a repeat with the same key returns the stored outcome instead of charging again. See [Payment State Machines & Idempotency](#/l/11-payments-uploads/state-machine-idempotency).
 
+> [!REAL] The Pay button tapped twice
+> On a slow network you tap "Pay" twice. With an idempotency key, Razorpay or Stripe sees the same key twice and returns the first result instead of charging you again.
+
 ## Concurrency control
 
 Prevent lost updates when two clients edit the same resource:
@@ -73,6 +82,9 @@ Prevent lost updates when two clients edit the same resource:
 - **Header versioning** (`Accept: application/vnd.example.v2+json`): cleaner URLs, less visible.
 - Prefer **additive, backward-compatible changes** (new optional fields) so versions rarely need bumping. Never remove or rename fields in place. Deprecate with notice and telemetry on usage.
 
+> [!REAL] Old phone chargers still work
+> New phones come out but old chargers keep working for a while. `/v1` keeps old app versions working while `/v2` serves new ones, until everyone upgrades.
+
 ## Long-running operations
 
 If work takes longer than a request should (video processing, report generation):
@@ -84,6 +96,9 @@ GET  /v1/exports/77     → { "status": "DONE", "url": "https://..." }
 ```
 
 Or notify via webhook / SSE when done.
+
+> [!REAL] The passport application number
+> You don't wait at the passport office for your passport. You get an application number and check its status later. A 202 Accepted with a status URL is the same thing.
 
 ## Architectural patterns
 
@@ -104,6 +119,9 @@ flowchart LR
   BM --> R[Recommendation svc]
 ```
 
+> [!REAL] Different waiters for different tables
+> The kids' table and the business-lunch table need different service. A BFF gives the mobile app and the web app each their own tailored API layer.
+
 ### API composition / aggregation
 One endpoint calls several services in parallel and merges results (a product page needs catalogue, price, stock, reviews). Use parallel calls with timeouts and partial responses if a non-critical part fails.
 
@@ -115,6 +133,9 @@ Accept the request (`202`), process via a queue, expose status or call back. Pro
 
 ### Strangler fig
 Migrate a legacy system by routing endpoints one at a time to new services behind the same API, until the old system can be retired.
+
+> [!REAL] Renovating a house room by room
+> You don't demolish the house; you rebuild one room at a time while the family keeps living there. Requests for the rebuilt "rooms" go to the new service, the rest to the old monolith, until the old one can be removed.
 
 ## Contracts and documentation
 

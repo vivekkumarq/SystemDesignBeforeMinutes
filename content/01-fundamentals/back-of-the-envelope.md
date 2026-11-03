@@ -2,6 +2,9 @@ Back-of-the-envelope estimation means working out, in a couple of minutes and wi
 
 ## The numbers to keep in your head
 
+> [!REAL] Why rough numbers are enough
+> A contractor quoting for your house doesn't count bricks; they know "about 8 bricks per square foot" and multiply. Engineers do the same: knowing that one server handles ~5,000 simple requests per second tells you a 50,000 RPS system needs about 10–20 servers.
+
 ### Time
 - 1 day ≈ 86,400 seconds. Round it to **100,000 (10⁵)**. This one shortcut makes most estimates trivial.
 - 1 month ≈ 2.5 million seconds. 1 year ≈ 30 million seconds.
@@ -40,6 +43,19 @@ These vary a lot, but they are good enough to decide how many machines you need.
 6. **Estimate bandwidth.** Requests per second × response size.
 7. **Sanity-check.** Does the answer imply a sensible number of machines?
 
+> [!REAL] Estimating chai sales at a railway station
+> How much chai does Pune station sell a day? About 2 lakh passengers × 1 in 4 buys chai ≈ 50,000 cups. That's the same chain as DAU × actions per user ÷ 86,400 seconds = requests per second. Wrong by 2×? Fine. Wrong by 100×? Then the design is wrong.
+
+```mermaid
+flowchart LR
+  U[Daily active users] --> A[× actions per user]
+  A --> D[÷ 86,400 seconds]
+  D --> Q[Average QPS]
+  Q --> P[× 2–3 for peak]
+  P --> S[÷ requests per server]
+  S --> N[Servers needed]
+```
+
 ## Worked example: a photo-sharing app
 
 Assumptions, stated aloud:
@@ -69,6 +85,9 @@ In two minutes you have learned that the design needs object storage, a CDN, hea
 > [!TIP] Say your assumptions out loud
 > The interviewer cares far more about your reasoning than your arithmetic. "Let's assume 100 million daily users, each viewing about 50 photos" invites them to correct you if they had different numbers in mind.
 
+> [!REAL] Instagram for real
+> Instagram has reported around 100 million photos and videos uploaded per day. At ~2 MB each that's ~200 TB of new media every day, which is why media goes to object storage plus a CDN and never into a relational database.
+
 ## Capacity planning in real life
 
 Estimation in an interview is the first step of real capacity planning:
@@ -77,6 +96,9 @@ Estimation in an interview is the first step of real capacity planning:
 - **N+1 or N+2.** If you need N machines for peak load, run at least N+1 so one can fail or be patched.
 - **Growth.** Plan for the next 12–18 months, not today. Re-estimate as real numbers come in.
 - **Measure, then model.** Load-test one server to find its real ceiling instead of trusting rules of thumb.
+
+> [!REAL] IRCTC Tatkal at 10 a.m.
+> IRCTC doesn't plan for the average day. It plans for 10:00 a.m., when Tatkal booking opens and traffic jumps many times above normal within seconds. Real capacity plans size for the peak plus headroom, not the daily average.
 
 ### Quick server-count formula
 

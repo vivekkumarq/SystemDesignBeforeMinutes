@@ -2,12 +2,23 @@ A cache you do not measure is a cache you cannot trust. These are the numbers to
 
 ## The core metrics
 
+```mermaid
+flowchart LR
+  R[100 requests] --> C{Cache}
+  C -- 95 hits, ~1 ms --> U[User]
+  C -- 5 misses --> DB[(Database ~10 ms)]
+  DB --> C
+```
+
 ### Hit ratio
 `hits ÷ (hits + misses)`. The headline number.
 
 - Typical targets: **90–99%** for a read-heavy cache of hot objects.
 - Watch the trend more than the absolute value. A sudden drop usually means a deploy changed key formats, a TTL changed, or traffic shifted.
 - Look at hit ratio **per key prefix** (`product:*`, `user:*`). A global 95% can hide one prefix at 20% that is wasting memory.
+
+> [!REAL] How often the fridge has what you want
+> If 95 out of 100 times you find milk in the fridge, your hit ratio is 95%. The other 5 times you walk to the shop (the database).
 
 ### Why a small hit-ratio change matters
 The database sees only the misses:
@@ -16,6 +27,9 @@ The database sees only the misses:
 hit ratio 90% → DB gets 10% of reads
 hit ratio 99% → DB gets  1% of reads   (10× less load from a 9-point change)
 ```
+
+> [!REAL] 95% vs 99%
+> At 95%, 5 of every 100 requests hit the database; at 99%, only 1. Going from 95% to 99% cuts database load by 5×, even though it "looks" like a 4% improvement.
 
 ### Latency
 - **Cache latency:** p50 and p99 of GET/SET. Redis is normally sub-millisecond; spikes point to big keys, slow commands (`KEYS *`), network saturation or CPU limits.
@@ -28,6 +42,9 @@ e.g. 0.95 × 1 ms + 0.05 × (1 + 40) ms ≈ 3 ms
 
 ### Eviction rate
 Items removed because memory is full. High evictions with a low hit ratio means the working set does not fit or you are caching low-value data.
+
+> [!REAL] Throwing out food you just bought
+> A high eviction rate is like a fridge so small you throw out yesterday's vegetables to fit today's. The cache is too small for what you actually use.
 
 ### Expiration and invalidation rates
 Which removal path dominates tells you where to tune. See [Combining Eviction and Invalidation](#/l/04-caching/eviction-and-invalidation).
@@ -54,6 +71,9 @@ The point of the cache: compare database read QPS with and without the cache, an
 
 ### 2. Size the cache to the working set
 Estimate hot items × size × ~1.5 overhead. Add memory until the hit-ratio curve flattens; beyond that point, more memory buys little.
+
+> [!REAL] Pack what you'll actually wear
+> For a week's trip you pack a week's clothes, not your whole wardrobe. Size the cache for the data that's actively used today, not the whole database.
 
 ### 3. Tune TTLs
 - Too short: needless misses and reloads.

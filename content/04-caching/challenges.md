@@ -27,6 +27,9 @@ others: wait briefly and re-read the cache, or serve the stale value
 - **Probabilistic early expiration:** each request has a small, rising chance of refreshing the key *before* it expires, so refreshes spread out instead of happening all at once.
 - **Pre-warming / refresh-ahead:** a scheduled job refreshes known hot keys before they expire.
 
+> [!REAL] Everyone rushes the counter at once
+> The sweet shop's display runs out of jalebi and 50 customers all ask the kitchen at once. Instead, one person goes to the kitchen and the others wait for that batch. In caching, a lock or "single flight" makes one request rebuild a hot key.
+
 ## 2. Cache avalanche
 
 **What happens:** many keys expire **at the same moment** (they were all loaded together with the same TTL, e.g. after a deploy or a cache restart), or the cache cluster itself goes down. The whole read load lands on the database.
@@ -38,6 +41,9 @@ others: wait briefly and re-read the cache, or serve the stale value
 - **Warm up gradually** after a cold start: pre-load hot keys or ramp traffic slowly.
 - **Multi-level caching:** a small local cache absorbs some load if the distributed cache disappears.
 
+> [!REAL] All the milk expires on the same day
+> If every carton in the shop has the same expiry date, the shelf goes empty at once. Add random jitter to TTLs so keys don't all expire together.
+
 ## 3. Cache penetration
 
 **What happens:** requests ask for keys that **do not exist** in the database at all (a bug, a scraper, or an attack with random IDs). Every request misses the cache *and* the database, so the cache gives no protection.
@@ -46,6 +52,9 @@ others: wait briefly and re-read the cache, or serve the stale value
 - **Negative caching:** cache "not found" for a short TTL (`user:999999 → NULL, 60 s`).
 - **Bloom filter in front:** keep a Bloom filter of all valid IDs; if it says "definitely not present", reject immediately without touching cache or database. See [Bloom Filter vs Hash Table](#/l/09-tradeoffs/bloom-vs-hashtable).
 - **Input validation:** reject malformed IDs early; rate-limit abusive clients.
+
+> [!REAL] Asking for a product that doesn't exist
+> Bots request random product IDs that don't exist, so every request misses the cache and hits the database. Cache the "not found" result, or use a Bloom filter to reject unknown IDs early.
 
 ## 4. Hot keys
 
@@ -57,11 +66,17 @@ others: wait briefly and re-read the cache, or serve the stale value
 - **Read replicas** of the cache shard holding the hot key.
 - **Detect hot keys** automatically (Redis `--hotkeys`, client-side sampling) so you can react during an event.
 
+> [!REAL] The IPL final score
+> During an IPL final, one key ("live score") gets millions of reads per second, more than one Redis node can serve. Copy it to several keys or keep it in each server's local memory for a second.
+
 ## 5. Big keys
 
 **What happens:** a single value is huge (a list with millions of members, a multi-megabyte JSON). Reading it blocks a single-threaded server like Redis, saturates the network, and deleting it can freeze the node.
 
 **Fixes:** split into smaller keys (paginate lists, use hashes with fields), compress values, delete with non-blocking commands (`UNLINK`), and set size limits in code review.
+
+> [!REAL] One suitcase too heavy to lift
+> A single 50 MB value (say, a celebrity's full follower list) blocks the cache node while it's being read. Split it into pages.
 
 ## 6. Inconsistency between cache and database
 
@@ -74,6 +89,9 @@ others: wait briefly and re-read the cache, or serve the stale value
 **What happens:** a new cache node, a restart or a new region starts empty; hit ratio is 0% and the database takes the full load.
 
 **Fixes:** warm the cache from logs of popular keys or a snapshot, shift traffic gradually, keep persistence (Redis RDB/AOF) for faster restarts.
+
+> [!REAL] A new shop with empty shelves
+> A freshly restarted cache has nothing in it, so the database takes the full load. Warm it up with popular items before sending real traffic, the way a shop restocks before opening.
 
 ## Summary table
 

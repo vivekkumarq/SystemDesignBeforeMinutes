@@ -6,13 +6,22 @@ If DNS fails, your service is unreachable even when every server is healthy. DNS
 An attacker tricks a recursive resolver into caching a forged answer, so users asking for `bank.com` are sent to the attacker's IP. Classic attacks guessed the query ID and raced the real answer.
 - **Defences:** source-port and query-ID randomisation in resolvers, and **DNSSEC**.
 
+> [!REAL] A fake signboard
+> Someone swaps the street sign so everyone heading to the bank ends up at a fake bank. A poisoned DNS cache sends users to a lookalike site with the real domain name in the address bar.
+
 ### DNS hijacking
 The attacker changes the real records, by compromising the registrar account, the DNS provider account, or the domain's name-server delegation.
 - **Defences:** registrar lock and registry lock, multi-factor authentication and least-privilege access on DNS accounts, change alerts, infrastructure-as-code with review.
 
+> [!REAL] Someone changes your registered address
+> If an attacker gets into your domain registrar account, they can point your domain anywhere. Registrar locks and 2FA on that account are basic hygiene.
+
 ### DDoS against DNS
 Flooding authoritative servers with queries (often random subdomains, so caches don't help) makes the domain unresolvable. Large DNS outages have taken down many major sites at once.
 - **Defences:** anycast providers with huge capacity, multiple independent providers, rate limiting.
+
+> [!REAL] The 2016 Dyn attack
+> In October 2016 the Mirai botnet, made of hacked cameras and routers, flooded the DNS provider Dyn. Twitter, Netflix, Reddit and GitHub became unreachable for many users because their names couldn't be looked up.
 
 ### DNS amplification (you as the weapon)
 Attackers send small queries with a spoofed source IP to open resolvers, which send large responses to the victim.
@@ -21,6 +30,9 @@ Attackers send small queries with a spoofed source IP to open resolvers, which s
 ### Subdomain takeover
 A record points to a resource you no longer own (a deleted cloud bucket or app). An attacker claims that resource and now serves content under your domain.
 - **Defences:** remove records when decommissioning resources; audit dangling CNAMEs regularly.
+
+> [!REAL] An old shop board still up
+> You close your shop on `promo.example.com` (a deleted cloud bucket) but leave the signboard (DNS record). Someone else rents the empty shop and now serves anything under your name. Delete DNS records when you delete the resource.
 
 ### Privacy and tampering on the network
 Traditional DNS queries travel unencrypted, so networks can observe or alter them.
@@ -39,6 +51,9 @@ DNSSEC adds **cryptographic signatures** to DNS records.
 
 ### Use more than one provider
 A single DNS provider is a single point of failure. Many large companies serve their zone from **two independent authoritative providers**, both listed in NS records. If one is attacked or fails, resolvers use the other. The cost: keeping zones in sync, and some advanced features (traffic steering) differ between providers.
+
+> [!REAL] Two phone networks
+> Many people keep two SIMs so one network outage doesn't cut them off. After the Dyn attack, many large sites started using two DNS providers.
 
 ### Manage DNS as code
 Store zones in version control and apply them through a pipeline (e.g. Terraform, OctoDNS). Benefits: review, history, rollback, synchronisation across providers, and fewer typos taking production down.

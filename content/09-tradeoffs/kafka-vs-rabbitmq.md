@@ -25,6 +25,9 @@
 - **Stream processing** with joins, windows and state (Kafka Streams, Flink).
 - Event sourcing or a durable "source of truth" event log.
 
+> [!REAL] A CCTV recording
+> Kafka is a recording everyone can rewind and replay, at different speeds, as many times as they want. Good for event history, analytics and many independent readers.
+
 ## Choose RabbitMQ when
 
 - **Task/work queues:** distribute jobs among workers with per-message acknowledgement, retries and requeueing.
@@ -33,6 +36,9 @@
 - **Request/reply (RPC) over messaging.**
 - Lower volume, latency-sensitive messaging where retention and replay aren't needed.
 - Integration with protocols such as MQTT or STOMP.
+
+> [!REAL] A courier delivering parcels
+> RabbitMQ delivers each parcel to the right recipient with routing rules and per-message acknowledgements. Once delivered, it's gone. Good for task queues and complex routing.
 
 ## Common mistakes
 

@@ -6,6 +6,9 @@ Coding rounds show that you can write a correct function. They say nothing about
 
 That is why the round carries more weight as you get more senior. For a junior role the interviewer wants to see that you know the building blocks. For a senior role they want to see you **drive** the conversation, make decisions and defend them.
 
+> [!REAL] Coding vs building
+> Knowing how to lay one brick perfectly (a coding round) doesn't mean you can plan a building that stands in an earthquake. The system design round checks whether you can plan the building.
+
 ## What the interviewer is actually scoring
 
 Most companies use a rubric that boils down to four or five signals:
@@ -22,6 +25,9 @@ Notice what is *not* on the list: memorising how a specific company built their 
 
 > [!INTERVIEW] The one-line summary
 > The interviewer is asking: "Would I trust this person to lead the design of a new service on my team?"
+
+> [!REAL] Like a driving test
+> A driving examiner isn't checking that you reach the destination; they watch how you check mirrors, signal and handle surprises. Interviewers score your process (clarifying, trade-offs, communication) more than the final diagram.
 
 ## How the hour usually goes
 
@@ -51,6 +57,9 @@ The full method is in [A Framework for Any Design Question](#/l/01-fundamentals/
 - **Going silent.** The interviewer cannot grade thinking they cannot hear.
 - **Defending a choice to the death.** When the interviewer pushes back, they are often testing whether you can weigh new information. "Good point, that changes things. If writes are that bursty, I'd put a queue in front…" is a great answer.
 - **Running out of time on the easy parts.** Spending 25 minutes on the login flow leaves nothing for the interesting problems.
+
+> [!REAL] Building a mall for a tea stall
+> The classic failure is designing Kafka, 12 microservices and multi-region replication for a system with 1,000 users. That's building a shopping mall to sell chai. Match the design to the numbers.
 
 ## How to prepare
 

@@ -24,6 +24,9 @@ Typical settings:
 /api/me                   Cache-Control: private, no-store
 ```
 
+> [!REAL] The label on the food box
+> "Best before 1 year" on a pickle jar and "consume today" on fresh paneer tell the shop how long to keep each item. `Cache-Control: max-age=31536000` vs `no-store` tells the CDN the same thing.
+
 ## 2. Version static assets
 
 Put a content hash in the filename (`app.3f9a1c.js`). Each build produces new names, so:
@@ -32,6 +35,9 @@ Put a content hash in the filename (`app.3f9a1c.js`). Each build produces new na
 - you never need to purge assets.
 
 Only the small HTML entry point needs a short TTL or revalidation.
+
+> [!REAL] A new edition of the textbook
+> When a textbook changes, the publisher prints "2nd edition" on the cover so nobody confuses it with the old one. `app.3f9c2.js` is the 2nd edition; the old file can stay cached for a year without causing harm.
 
 ## 3. Design cache keys carefully
 
@@ -42,13 +48,22 @@ The cache key decides what counts as "the same object". A bad cache key destroys
 - **Vary only on what matters.** `Vary: Accept-Encoding` is fine; `Vary: User-Agent` explodes into thousands of variants. Prefer a normalised device-class header if you must vary by device.
 - **Never** include cookies or auth headers in keys for public content, and never cache personalised responses as public.
 
+> [!REAL] Tracking parameters break the cache
+> `/shoes?utm_source=instagram` and `/shoes?utm_source=whatsapp` are the same page. If both are separate cache keys, the CDN fetches the page twice. Strip tracking parameters from the key.
+
 ## 4. Tiered caching / origin shield
 
 With hundreds of PoPs, each missing independently, the origin sees a request from every PoP for each object. An **origin shield** (a designated mid-tier cache) collapses them into one, raising the effective hit ratio and protecting the origin, especially for long-tail content.
 
+> [!REAL] The district warehouse
+> Village shops order from the district warehouse, not the national factory. Only the district warehouse talks to the factory, so the factory sees a handful of requests instead of thousands.
+
 ## 5. Request collapsing
 
 When many users request the same uncached object at the same moment, a good CDN sends **one** request to the origin and serves everyone from that response. This is the CDN version of stampede protection. It matters for live video, where thousands request the newest segment simultaneously.
+
+> [!REAL] One trip for the whole office
+> When 20 colleagues want samosas at the same time, one person goes and brings back 20. When 10,000 viewers request a new video chunk at once, the edge sends a single request to the origin.
 
 ## 6. Optimise what is delivered
 
@@ -71,6 +86,9 @@ Run small functions at the edge (Cloudflare Workers, Lambda@Edge, Fastly Compute
 - assemble responses from cached fragments (edge-side includes).
 
 This turns "uncacheable because personalised" into "mostly cached plus a little edge logic".
+
+> [!REAL] Fixing it at the counter
+> Instead of sending every form back to head office, the counter clerk handles simple changes on the spot. Cloudflare Workers can redirect, A/B-test or check a token at the edge, close to the user.
 
 ## 9. Measure
 

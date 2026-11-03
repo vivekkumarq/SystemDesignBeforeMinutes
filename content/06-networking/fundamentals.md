@@ -19,6 +19,9 @@ Load balancers are described as L4 or L7 by which of these layers they understan
 - Packets travel hop by hop through routers. Between the large networks of the internet (autonomous systems), **BGP** decides the paths.
 - IP itself is **best effort**: packets can be lost, duplicated or arrive out of order.
 
+> [!REAL] Postal addresses and post offices
+> An IP address is the postal address of a machine. Routers are post offices that read only the PIN code and pass the packet to the next post office closer to the destination.
+
 ## TCP: reliable streams
 
 TCP builds a reliable, ordered byte stream on top of unreliable IP.
@@ -40,6 +43,9 @@ sequenceDiagram
 - **Flow control:** the receiver advertises how much it can accept.
 - **Congestion control:** senders start slowly (slow start) and back off when packets are lost, so the network is not overwhelmed. This is why new connections are slower than warm ones.
 
+> [!REAL] Registered courier with tracking
+> TCP numbers every packet, waits for acknowledgements and re-sends what's lost, the way a courier service tracks every parcel and re-sends a lost one. Reliable and in order, but with a bit of delay.
+
 ## UDP: fast and simple
 
 UDP sends independent datagrams with no handshake, no retransmission and no ordering.
@@ -56,12 +62,18 @@ UDP sends independent datagrams with no handshake, no retransmission and no orde
 | Speed / overhead | Higher overhead | Minimal |
 | Typical use | Web, APIs, databases, file transfer | DNS, real-time media, games, QUIC |
 
+> [!REAL] Shouting across the room
+> UDP just sends the packet and hopes. In a video call, a lost packet is a tiny glitch; waiting for it to be re-sent would freeze the call. That's why Zoom, online games and live video use UDP.
+
 ## TLS: encryption
 
 TLS encrypts the connection and proves the server's identity using certificates.
 - **TLS 1.2:** two round trips for the handshake.
 - **TLS 1.3:** one round trip, and **0-RTT** resumption for returning clients.
 - Terminating TLS close to the user (at a CDN or regional load balancer) saves the long round trips.
+
+> [!REAL] A locked box only the receiver can open
+> Without TLS, your password crosses the café Wi-Fi as a postcard anyone can read. With TLS it travels in a locked box; the padlock in the browser means the box is locked.
 
 ## HTTP versions
 
@@ -72,6 +84,9 @@ TLS encrypts the connection and proves the server's identity using certificates.
 | HTTP/3 | Runs over **QUIC** (on UDP); independent streams, faster handshakes, connection migration across networks | Newer; some networks block UDP |
 
 QUIC combines transport and TLS 1.3 setup into one round trip (0-RTT on resumption) and keeps a connection alive when a phone switches from Wi-Fi to mobile data.
+
+> [!REAL] One counter vs many counters
+> HTTP/1.1 is a single counter where everyone waits behind the slow customer. HTTP/2 lets many requests share one connection at the same time. HTTP/3 (over QUIC/UDP) also stops one lost packet from holding up all the others, which helps on flaky mobile networks.
 
 ## What happens when you type a URL
 
@@ -103,6 +118,9 @@ sequenceDiagram
 5. The browser parses HTML and fetches dozens of sub-resources, then renders.
 
 Each of those round trips costs real time when the server is far away, which is why CDNs, connection reuse, HTTP/2–3 and TLS 1.3 matter so much.
+
+> [!REAL] Visiting a friend's new flat
+> You look up the address (DNS), drive there (TCP connection), show ID at the gate (TLS handshake), ask for your friend (HTTP request) and get let in (response).
 
 ## Other protocols you will mention
 

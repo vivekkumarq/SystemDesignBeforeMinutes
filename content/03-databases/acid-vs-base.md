@@ -4,6 +4,9 @@ ACID and BASE are two philosophies for handling data. ACID puts **correctness fi
 
 **Atomicity** (all or nothing), **Consistency** (rules always hold), **Isolation** (concurrent transactions don't interfere), **Durability** (committed means saved). The traditional promise of relational databases. Full detail in [Transactions, Isolation & ACID](#/l/03-databases/sql-and-acid).
 
+> [!REAL] A bank transfer
+> ACID is how your bank behaves: the transfer is all-or-nothing, the balance is correct the moment you look, and once confirmed it's permanent.
+
 ## BASE
 
 - **Basically Available:** the system keeps responding even when parts of it fail, possibly with stale or partial data.
@@ -11,6 +14,9 @@ ACID and BASE are two philosophies for handling data. ACID puts **correctness fi
 - **Eventually consistent:** if no new writes arrive, all replicas converge to the same value.
 
 BASE is the natural model for distributed, replicated, partition-tolerant stores such as Cassandra, DynamoDB (by default) and many caches.
+
+> [!REAL] The YouTube view counter
+> A YouTube video can show 1,002 views on your phone and 998 on your laptop for a few seconds. Nobody is harmed and the counts converge. That's BASE: always available, eventually consistent.
 
 ## Side by side
 
@@ -49,6 +55,9 @@ flowchart LR
 ```
 
 A common architecture keeps the source of truth in an ACID store and feeds eventually consistent read models (search index, cache, analytics) from its change events.
+
+> [!REAL] One app, two rules
+> In Swiggy, the payment and order status need ACID; the restaurant's rating and "1,200 people ordered this" can be eventually consistent. Good designs pick per piece of data, not per company.
 
 ## It is a spectrum, not a switch
 

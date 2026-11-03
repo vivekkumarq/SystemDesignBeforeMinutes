@@ -20,6 +20,9 @@ flowchart LR
 - **Single point of failure.** One machine failing means total downtime.
 - **Downtime to upgrade**, unless you have a failover setup.
 
+> [!REAL] Swapping a hatchback for a bus
+> When your family grows, you can buy a bigger car. That works until you need a bus, and there is no "bigger bus". Stack Overflow famously ran for years on a handful of very powerful servers; vertical scaling goes surprisingly far.
+
 ## Horizontal scaling: more machines
 
 Horizontal scaling (scaling **out**) means adding more servers and spreading the work across them.
@@ -43,6 +46,9 @@ flowchart LR
 - **Distributed-systems complexity.** Data split across machines brings replication lag, partial failures, consistency questions and network partitions.
 - **More operational work:** load balancers, service discovery, monitoring many nodes.
 
+> [!REAL] A fleet of autos
+> Instead of one bus, use 20 autos. If one breaks down, the others keep going, and on festival days you call in more. Google Search runs on many thousands of ordinary machines rather than one giant one.
+
 ## Side by side
 
 | | Vertical | Horizontal |
@@ -65,6 +71,9 @@ Any state that lives in a server's memory (sessions, uploaded files, in-memory c
 
 Once the servers are stateless, the load balancer can send any request anywhere and autoscaling becomes trivial. See [Stateful vs Stateless](#/l/09-tradeoffs/stateful-vs-stateless).
 
+> [!REAL] Hotel room keys
+> A hotel doesn't remember which guest is in which room at the door; your key card carries the information. A stateless server reads the session from a token or from Redis, so any server can handle your next click.
+
 ### 2. Scale the data tier in stages
 The database is almost always the hardest part. A typical progression:
 
@@ -76,8 +85,14 @@ The database is almost always the hardest part. A typical progression:
 
 Each step adds complexity, so take the next one only when the numbers say you need it.
 
+> [!REAL] A shop growing into a chain
+> First you hire a helper (read replica), then you open a second counter (cache), and only when the shop is bursting do you open branches in other cities (sharding). Each step is more work, so take them in order.
+
 ### 3. Move slow work off the request path
 Sending emails, resizing images, updating search indexes: put them on a queue and let workers do them. The web tier stays fast, and you can scale workers separately.
+
+> [!REAL] The dry-cleaner's receipt
+> The dry-cleaner doesn't make you wait while they clean your shirt; they give you a receipt and you collect it later. When you upload a YouTube video you get "Processing…" immediately while workers transcode it in the background.
 
 ## Scalability is more than capacity
 
@@ -89,6 +104,9 @@ A system can have plenty of servers and still not scale because of:
 
 > [!INTERVIEW] What a good answer sounds like
 > "I'd start by scaling the stateless API tier horizontally behind a load balancer, which is easy. The database is the real constraint. At 5K writes per second a single well-tuned primary with read replicas is fine; I'd only shard when writes or data size outgrow one machine, and I'd shard by user ID because almost every query is per user."
+
+> [!REAL] One billing counter
+> A supermarket can have 50 aisles, but if there's only one billing counter, the queue still goes out the door. A single shared database table or a global lock is that billing counter.
 
 ## Key takeaways
 

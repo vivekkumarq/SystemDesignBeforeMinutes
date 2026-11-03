@@ -18,8 +18,14 @@ Ask questions until the problem is concrete.
 
 Write the agreed list in a corner of the board. You will refer back to it.
 
+> [!REAL] An architect asks before drawing
+> An architect designing your house first asks: how many people, any elderly parents, do you work from home? Skipping that and drawing a 2BHK for a family of eight wastes everyone's time. In an interview, those questions *are* the first scoring points.
+
 ### Step 2: Estimates (3–5 minutes)
 DAU → requests per second (average and peak) → read/write ratio → storage per year → bandwidth. Then **say what the numbers imply**: "50K reads a second at a 100:1 ratio means caching is central; 5 TB a day means object storage, not a database." See [Back-of-the-Envelope Estimation](#/l/01-fundamentals/back-of-the-envelope).
+
+> [!REAL] Ordering for a party
+> Before ordering food for a party you ask "how many guests?" because 10 people and 500 people need a different caterer. Estimates tell you whether you need one database or a hundred.
 
 ### Step 3: API (3–5 minutes)
 Define the main endpoints. This forces you to pin down inputs and outputs.
@@ -32,6 +38,9 @@ GET  /v1/urls/{code}/stats → { clicks, byCountry, ... }
 
 Mention pagination (cursor-based for feeds), idempotency keys for anything that creates or charges, and authentication.
 
+> [!REAL] The restaurant menu
+> The API is the menu: what the customer can ask for and in what form. The kitchen (implementation) can change completely without the menu changing.
+
 ### Step 4: Data model (3–5 minutes)
 List the core entities and, more importantly, **how they are queried**. The access pattern picks the database:
 
@@ -39,6 +48,9 @@ List the core entities and, more importantly, **how they are queried**. The acce
 - Huge write volume, always queried by one key and a time range? Wide-column.
 - Simple lookups by key at enormous scale? Key-value.
 - Relationship traversal ("friends of friends")? Graph.
+
+> [!REAL] The khata book's columns
+> A shopkeeper's ledger has columns for date, customer, item, amount. Decide the columns first and the access patterns ("show all dues for one customer") tell you how to index it.
 
 ### Step 5: High-level design (10–15 minutes)
 Draw the boxes and walk through each core use case as a request flowing through them.
@@ -61,6 +73,9 @@ Narrate as you draw: "A write goes through the gateway to the post service, whic
 
 Keep this first version simple. It should work for the stated scale, not for a hypothetical billion users.
 
+> [!REAL] The city map before the street map
+> First draw the city's highways and districts (clients, load balancer, services, databases, cache, queue). Street-level detail comes later, only where the interviewer wants to zoom in.
+
 ### Step 6: Deep dives (15–20 minutes)
 Now improve the design where it matters. Either the interviewer chooses, or you propose: "The two hardest parts are fan-out for celebrity accounts and keeping counters accurate. Shall I start with fan-out?"
 
@@ -72,6 +87,9 @@ Typical deep-dive themes:
 - **Data growth:** retention, archiving, tiered storage.
 
 For each one, present **options and a choice**: "We could fan out on write or on read. Fan-out on write makes reads cheap but is terrible for accounts with 50M followers, so I'll use a hybrid…"
+
+> [!REAL] The doctor's follow-up questions
+> After the overall check-up, a good doctor zooms into the one thing that looks off. The interviewer will pick one component ("how does the feed stay fresh for 100M users?") and that conversation decides your level.
 
 ### Wrap-up (2–3 minutes)
 Summarise the design in a few sentences, name the remaining risks, and say what you would add next: monitoring, alerting, a multi-region setup, analytics.

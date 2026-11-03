@@ -17,6 +17,9 @@ session:9f2a   → {"userId": 42, "expires": 1767225600}
 ratelimit:u42  → 17
 ```
 
+> [!REAL] The cloakroom token
+> Hand over your bag, get token #47. Later, show #47 and get the bag. No searching by colour. Redis and DynamoDB are cloakrooms: very fast when you know the key.
+
 ## 2. Document stores
 
 **Model:** each record is a self-contained JSON-like document with nested fields and arrays. Documents in one collection can have different fields.
@@ -39,6 +42,9 @@ ratelimit:u42  → 17
 
 **Use for:** product catalogues with varied attributes, content management, user profiles, anything read and written as a whole object.
 
+> [!REAL] One file per customer
+> A Flipkart product has very different attributes: a phone has RAM and camera, a shirt has size and fabric. A document store like MongoDB keeps each product as one flexible JSON document.
+
 ## 3. Wide-column stores
 
 **Model:** rows identified by a **partition key**, with many columns sorted by a **clustering key** inside each partition. Think "a sorted map of sorted maps", spread across a cluster.
@@ -59,6 +65,9 @@ partition key: chat_id = 991
 
 **Use for:** chat messages, activity feeds, IoT and time-series data, event logs, anything write-heavy that is always read by a known key and time range.
 
+> [!REAL] A huge register with millions of columns
+> Cassandra lets each row have its own set of columns, and it is built for enormous write volumes. Discord stored billions of chat messages this way (it later moved to ScyllaDB, a Cassandra-compatible database).
+
 ## 4. Graph databases
 
 **Model:** **nodes** (entities) and **edges** (relationships), both with properties. Traversing relationships is the primary operation.
@@ -75,6 +84,9 @@ partition key: chat_id = 991
 **Weaknesses:** harder to shard, since a good partition of a graph is difficult; smaller ecosystem; overkill if you only ever need one hop.
 
 **Use for:** social graphs, recommendations, fraud rings, knowledge graphs, network topology.
+
+> [!REAL] "People you may know"
+> LinkedIn's "2nd-degree connection" is a friends-of-friends walk. In a graph database that's following edges; in SQL it's a stack of painful self-joins.
 
 ## Related specialised stores
 
@@ -97,6 +109,14 @@ partition key: chat_id = 991
 
 > [!WARNING] NoSQL is not automatically faster
 > A key-value store is fast for lookups by key. Ask it "which users signed up last week in Pune?" and it becomes slow or impossible. The speed comes from narrowing what you can ask.
+
+```mermaid
+flowchart TD
+  Q{What does the data look like?} --> KV[Lookups by one key<br/>sessions, carts] --> R[Key-value: Redis, DynamoDB]
+  Q --> DOC[Self-contained objects<br/>with varying fields] --> M[Document: MongoDB]
+  Q --> WC[Huge write volume,<br/>time-ordered rows] --> C[Wide-column: Cassandra]
+  Q --> G[Relationships are the point<br/>friends of friends] --> N[Graph: Neo4j]
+```
 
 ## Key takeaways
 

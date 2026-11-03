@@ -10,6 +10,9 @@ Placing an order involves:
 
 If inventory fails after payment succeeded, the customer must be refunded. Distributed two-phase commit (2PC) could lock all four databases until everyone agrees, but it is slow, blocks when the coordinator fails, and many systems (message brokers, third-party payment APIs) do not support it at all.
 
+> [!REAL] Booking a holiday package
+> A trip needs a flight, a hotel and a cab, each from a different company. No single transaction covers all three. If the hotel is full after the flight is booked, you must cancel the flight.
+
 ## How a saga works
 
 Each step is a **local transaction** in one service. Each step that can be undone has a **compensating transaction**.
@@ -40,6 +43,9 @@ sequenceDiagram
 
 Compensation is a **semantic undo**, not a rollback. The charge really happened and is visible on the statement; the refund is a new, separate transaction. Some actions cannot be undone at all (an email was sent), so you send a correction instead, or move such steps to the end of the saga.
 
+> [!REAL] Undo steps for every step
+> Each step has a matching undo: book flight / cancel flight, reserve hotel / cancel hotel. If step 3 fails, run the undo for steps 2 and 1. MakeMyTrip-style bookings work like this.
+
 ## Two ways to coordinate
 
 ### Choreography: services react to events
@@ -56,6 +62,9 @@ flowchart LR
 
 - **Pros:** loose coupling, no single coordinator, simple for short flows.
 - **Cons:** the overall flow is implicit and spread across services, hard to understand and monitor; cyclic dependencies between services; adding a step means changing several services.
+
+> [!REAL] A relay race
+> Each runner knows to start when the baton arrives; there's no coach shouting instructions. Simple for a few steps, but hard to follow when there are many runners.
 
 ### Orchestration: a coordinator directs the steps
 An **orchestrator** (a saga state machine) tells each service what to do and decides what happens next based on replies.
@@ -79,6 +88,9 @@ flowchart TB
 | Coupling | Loose | Services coupled to orchestrator's commands |
 | Best for | Simple flows, 2–4 steps | Complex flows, many steps, branching |
 
+> [!REAL] A wedding planner
+> The planner tells the caterer, decorator and band what to do and when, and knows what to cancel if the venue falls through. One place holds the whole flow.
+
 ## Hard parts to get right
 
 ### Lack of isolation
@@ -86,6 +98,9 @@ Saga steps commit immediately, so other transactions can see intermediate states
 - **Semantic locks:** mark records with a pending state (`PENDING_PAYMENT`) so other operations treat them carefully.
 - **Commutative updates** that work in any order.
 - **Reorder steps:** do risky, likely-to-fail steps (e.g. reserve inventory) **before** hard-to-compensate ones (e.g. charge card). Pivot steps go in the middle; anything after the pivot should be retryable until it succeeds.
+
+> [!REAL] Seeing a half-finished booking
+> Between "flight booked" and "hotel failed", another user may see the seat as taken even though it will be released. Sagas give up the isolation of a database transaction.
 
 ### Reliable messaging
 A service must update its database **and** publish an event atomically, or the saga stalls or diverges. Use the [Transactional Outbox](#/l/07-api-design/outbox).

@@ -7,11 +7,17 @@ A long random secret identifying a client application.
 - Simple; good for server-to-server and identifying a calling application.
 - Weak alone: no user identity, often long-lived, leak easily. Send only in headers over TLS, store only hashed, allow rotation, scope per environment.
 
+> [!REAL] A society gate pass
+> A gate pass shows which flat you belong to, but anyone who picks it up can use it. API keys identify the calling app; keep them secret and rotate them.
+
 ### Sessions (cookie-based)
 After login, the server stores a session and gives the browser a session ID cookie.
 - Easy to revoke (delete the session).
 - Needs a shared session store when servers scale out.
 - Protect cookies with `HttpOnly`, `Secure`, `SameSite`; defend against CSRF.
+
+> [!REAL] The wristband at a concert
+> After checking your ticket once at the entrance, you get a wristband and walk freely between areas. The cookie is the wristband; the server remembers which wristband belongs to whom.
 
 ### Tokens (JWT)
 A signed token carrying claims (`sub`, `exp`, `scope`). Services verify the signature locally without a database lookup.
@@ -24,13 +30,22 @@ header.payload.signature
 - **Pros:** stateless verification, scales well, works across services.
 - **Cons:** hard to revoke before expiry. Use short-lived access tokens (5–15 minutes) plus refresh tokens that *can* be revoked. Never put secrets in the payload (it's only encoded, not encrypted). Pin the algorithm; never accept `alg: none`.
 
+> [!REAL] A signed boarding pass
+> A boarding pass carries your name, flight and seat, signed by the airline. Any gate can check it without calling the check-in desk. A JWT carries the user's ID and roles, signed so it can't be altered.
+
 ### OAuth 2.0 and OpenID Connect
 - **OAuth 2.0** is for **delegated authorisation**: let an app act on a user's behalf with limited scopes, without seeing the user's password ("allow this app to read your calendar").
 - **OpenID Connect** adds **authentication** on top: an ID token telling the app who the user is ("Sign in with Google").
 - Common flows: **Authorization Code + PKCE** for web and mobile apps; **Client Credentials** for service-to-service.
 
+> [!REAL] "Sign in with Google"
+> When a new app asks to "Sign in with Google", Google tells the app who you are without ever showing it your Google password. It's like a valet key that drives the car but can't open the boot.
+
 ### Mutual TLS (mTLS)
 Both client and server present certificates. Strong identity for service-to-service traffic, often automated by a service mesh.
+
+> [!REAL] Both sides show ID
+> At a high-security office, the guard shows his badge and you show yours. In mTLS both client and server present certificates, which is common between internal services.
 
 ## Authorisation: what may you do?
 
@@ -45,6 +60,9 @@ Both client and server present certificates. Strong identity for service-to-serv
 Where to enforce:
 - **Gateway:** coarse checks (valid token, required scope).
 - **Service:** fine-grained checks (does this user own this resource?). Never rely on the gateway alone.
+
+> [!REAL] Your office access card
+> Your card opens the main door (authenticated) but not the server room (not authorised). Checking "who you are" and "what you may do" are separate steps.
 
 ## Rate limiting and quotas
 

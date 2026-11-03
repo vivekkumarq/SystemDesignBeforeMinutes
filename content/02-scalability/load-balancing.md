@@ -19,6 +19,9 @@ flowchart LR
 4. **Hides the fleet.** Clients see one address; you add and remove servers freely.
 5. **Often more:** TLS termination, compression, routing by URL, rate limiting.
 
+> [!REAL] Immigration counters at the airport
+> An officer directs each traveller to the next free counter and closes a counter whose officer steps away. Travellers just see "the immigration desk", not 30 separate desks.
+
 ## Load balancing algorithms
 
 ### Static algorithms (ignore current load)
@@ -36,6 +39,9 @@ flowchart LR
 
 **Random.** Pick a server at random. Surprisingly decent at scale, but uneven in the short term.
 
+> [!REAL] Round robin at the dealer's table
+> A card dealer gives one card to each player in turn, without checking anyone's hand. That's round robin: simple and fair if every request costs the same.
+
 ### Dynamic algorithms (look at current load)
 
 **Least connections.** Send the request to the server with the fewest open connections.
@@ -48,6 +54,9 @@ flowchart LR
 
 **Power of two choices.** Pick two servers at random and send the request to the less loaded one.
 - Nearly as good as checking every server, at a fraction of the cost. Used widely in large-scale proxies because it avoids every balancer stampeding to the same "least loaded" server at once.
+
+> [!REAL] Choosing the shortest supermarket queue
+> You look at the billing counters and join the one with the fewest people. That's "least connections". It handles the shopper with three trolleys better than strict turn-taking does.
 
 ### Picking one
 
@@ -67,6 +76,9 @@ Sticky sessions (session affinity) pin a user to one server, usually via a cooki
 - **Problem:** uneven load, and if that server dies the user's session is lost. Scaling down is awkward.
 - **Better:** make servers stateless and keep sessions in Redis or in a signed token, so stickiness becomes unnecessary.
 
+> [!REAL] Always going to the same barber
+> You always sit with the same barber because he knows your style. Nice until he's on leave and nobody else knows what you want. Sticky sessions break the same way when a server dies.
+
 ## Health checks in more detail
 
 - **Liveness:** is the process running? (Restart it if not.)
@@ -77,12 +89,18 @@ Sticky sessions (session affinity) pin a user to one server, usually via a cooki
 > [!WARNING] Deep health checks can cause cascading failures
 > If every server's health check depends on a shared database, a brief database hiccup marks *all* servers unhealthy at once and the load balancer has nowhere to send traffic. Many teams make the load-balancer check shallow and alert on dependencies separately.
 
+> [!REAL] The supervisor's round
+> A floor supervisor walks past every counter every few minutes. If a cashier doesn't respond, the counter is closed and customers are sent elsewhere until the cashier is back.
+
 ## The load balancer must not be a single point of failure
 
 A single load balancer is itself a SPOF. Common fixes:
 - **Active-passive pair** sharing a floating IP; the standby takes over on failure.
 - **Active-active** behind DNS or anycast, so several balancers share traffic.
 - **Managed cloud load balancers**, which are redundant by design.
+
+> [!REAL] The only gate to the stadium
+> If 50,000 fans must pass through one gate and it jams, the whole stadium is stuck. Real setups run two or more load balancers sharing a floating IP, or use DNS across several.
 
 ## Key takeaways
 

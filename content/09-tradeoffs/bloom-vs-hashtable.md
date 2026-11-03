@@ -16,6 +16,9 @@ check "carol" → bits 2, 9, 14 → bit 9 is 0 → definitely not present
 check "dave"  → bits 4, 11, 2 → all 1 → "probably present" (false positive!)
 ```
 
+> [!REAL] The bouncer's quick memory
+> The bouncer can't remember every guest, but he remembers some features. If a face doesn't match any he's seen, he's *sure* the person isn't on the list. If it does match, he checks the full list. "Definitely not" or "maybe", never a false "no".
+
 ### Tuning
 For n elements and a target false-positive rate p:
 - bits needed: `m ≈ −n · ln(p) / (ln 2)²`
@@ -48,6 +51,9 @@ Rule of thumb: **~10 bits per element gives ~1% false positives**; ~15 bits give
 - **"Have we seen this before?" at huge scale:** a web crawler checking whether a URL was already visited; detecting already-recommended articles; checking weak/breached passwords client-side.
 - **Distributed joins:** send a compact filter of keys to another node so it only ships matching rows.
 - **CDNs and "one-hit wonders":** cache an object only on its second request, using a Bloom filter to remember first requests and avoid filling the cache with items requested once.
+
+> [!REAL] "Username already taken?"
+> When you type a new username, a Bloom filter can instantly say "definitely available" for most names without hitting the database. Cassandra and similar databases use Bloom filters to skip files that can't contain a key.
 
 ## When to use a hash table instead
 

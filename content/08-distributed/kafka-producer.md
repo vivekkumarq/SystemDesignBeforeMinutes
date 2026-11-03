@@ -12,6 +12,9 @@ A Kafka producer has dozens of settings, but five of them decide most of its beh
 
 **Choose:** `all` for business events; `1` or `0` only for data you can afford to lose (high-volume telemetry).
 
+> [!REAL] Asking for a receipt
+> `acks=0` is dropping a letter in the post box and walking away. `acks=1` is getting a receipt from the counter clerk. `acks=all` is waiting until head office confirms it's filed in every copy of the register.
+
 ## 2. `enable.idempotence`: no duplicates from retries
 
 When enabled, the broker uses a producer ID plus per-partition sequence numbers to drop duplicate batches caused by retries, and keeps batches **in order** even with several in flight.
@@ -19,6 +22,9 @@ When enabled, the broker uses a producer ID plus per-partition sequence numbers 
 - Requires `acks=all`, `retries > 0` and `max.in.flight.requests.per.connection ≤ 5`.
 - Enabled by default in modern clients. Leave it on.
 - Scope: one producer session and per partition. It doesn't deduplicate across application restarts; use transactions (`transactional.id`) or consumer-side dedup for that.
+
+> [!REAL] A cheque number
+> If you hand over the same cheque twice by mistake, the bank sees the same cheque number and clears it only once. The idempotent producer numbers every message so the broker ignores retried duplicates.
 
 ## 3. `retries` and `delivery.timeout.ms`: how hard to try
 
@@ -44,12 +50,18 @@ linger.ms = 10–50 → fuller batches: much higher throughput and better compre
 
 For high-throughput pipelines, `batch.size=64–256 KB` with `linger.ms=10–50` often multiplies throughput. For latency-sensitive paths, keep `linger.ms` small.
 
+> [!REAL] The shared auto
+> An auto driver waits a few seconds to fill all seats before leaving. Each passenger waits slightly longer, but far more people move per hour. `linger.ms` is that short wait.
+
 ## 5. `compression.type`: fewer bytes on the wire and on disk
 
 Options: `none`, `gzip`, `snappy`, `lz4`, `zstd`.
 - Compression works per batch, so it pairs with batching. Bigger batches compress better.
 - `lz4` and `snappy`: fast with a moderate ratio. `zstd`: an excellent ratio at good speed, often the best default today. `gzip`: a good ratio but CPU-heavy.
 - Reduces network usage, broker disk and replication traffic, usually for a small CPU cost.
+
+> [!REAL] Vacuum bags
+> JSON events are full of repeated field names. Compressing a batch is like vacuum-packing clothes: the same content in a fraction of the space.
 
 ## Honourable mentions
 

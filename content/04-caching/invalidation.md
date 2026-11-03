@@ -9,6 +9,9 @@ Every cached copy can disagree with the truth. You choose a point on a spectrum:
 
 First decide **how stale is acceptable** for each piece of data, then pick the mechanism.
 
+> [!REAL] The notice board
+> A school's notice board is fast to read, but if the exam date changes and nobody updates the board, every student shows up on the wrong day. A cache is just as fast and just as wrong when you forget to update it.
+
 ## Strategies
 
 ### 1. Time-based expiry (TTL)
@@ -23,6 +26,9 @@ SET product:42 {...} EX 300   → gone after 5 minutes
 - **Tip:** add **jitter** (e.g. 300 ± 30 s) so keys created together do not expire together.
 - **Always set a TTL**, even when you also invalidate explicitly. It is the safety net.
 
+> [!REAL] Weather forecast refresh
+> A weather app refreshes the forecast every 15 minutes. It might be a little out of date, but that's fine for weather. TTL accepts a bounded amount of staleness.
+
 ### 2. Explicit invalidation on write (delete-on-write)
 When the data changes, the writer deletes (or updates) the cached key.
 
@@ -33,6 +39,9 @@ cache.delete("product:" + productId);
 
 - **Pros:** staleness window is tiny.
 - **Cons:** every writer must know every cache key derived from the data; keys holding aggregates or lists (`category:7:top-products`) are easy to miss; partial failures (DB updated, delete failed) leave stale data until TTL.
+
+> [!REAL] Tearing down the old notice
+> When the exam date changes, the teacher removes the old notice. The next student who asks gets the fresh date from the office.
 
 ### 3. Event-driven invalidation
 The database's change stream (change data capture) or an application event (`ProductUpdated`) is published to a queue; a consumer invalidates every affected key.
@@ -59,11 +68,17 @@ product:42:v7  → after update, readers look up product:42:v8
 
 Old versions are never read again and simply age out. Also used for whole namespaces: store `catalog_version = 18`, build keys like `catalog:18:product:42`, and bump to 19 to invalidate the entire catalogue in one step. Static assets use the same idea: `app.3f9a.js` gets a new filename on every build, so it can be cached forever.
 
+> [!REAL] style.v42.css
+> Websites rename files when they change (`app.8f3a1.js`). Browsers never get confused with the old version because the name itself is new. Nothing has to be "deleted".
+
 ### 5. Write-through
 Update the cache as part of the write. Keeps written keys fresh, but derived keys still need invalidating. See [Read & Write Caching Strategies](#/l/04-caching/read-write-strategies).
 
 ### 6. Validation (conditional requests)
 For HTTP caching: the client keeps the response and its `ETag`. Next time it sends `If-None-Match`; the server answers `304 Not Modified` if unchanged. Every request still reaches the server, but unchanged data costs almost nothing to send.
+
+> [!REAL] "Has anything changed since Tuesday?"
+> Your browser asks the server "has this image changed since version abc?" and gets a tiny "304 Not Modified" instead of the whole image again.
 
 ## Race conditions to know about
 
@@ -77,6 +92,9 @@ Now the cache holds stale data until TTL. Mitigations:
 - **Delayed double delete:** delete again a few hundred milliseconds after the write.
 - **Lease / version tokens:** the cache hands out a token on miss and rejects a fill whose token was invalidated by a later delete (the approach Facebook described for memcache).
 - Set-if-not-exists with versions: only fill if the version is newer than what is cached.
+
+> [!REAL] Two clerks, one notice board
+> Clerk A reads the old date from the file, gets distracted; Clerk B updates the file and clears the board; Clerk A comes back and pins the old date up again. That's why short TTLs or versioning are kept as a safety net.
 
 ### Multi-region and multi-layer caches
 Local in-process caches on 200 servers plus Redis plus a CDN means one change must reach many copies. Use short TTLs for local caches, pub/sub or event fan-out for invalidation messages, and CDN purge APIs (or versioned URLs) at the edge.

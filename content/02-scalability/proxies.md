@@ -24,6 +24,9 @@ The client is configured to send its requests through the proxy, and the proxy t
 
 **Key point:** the *client* knows about the proxy; the server usually does not.
 
+> [!REAL] The college Wi-Fi proxy
+> Your college network sends all student traffic through a proxy that blocks some sites and logs usage. Websites see the college's IP, not yours. The proxy works on behalf of the clients.
+
 ## Reverse proxy: acts for the server
 
 ```mermaid
@@ -47,6 +50,9 @@ Clients think they are talking to the website. In fact they are talking to the r
 - **Smooth deploys:** shift traffic between old and new versions.
 
 **Key point:** the *server side* deploys it; the client usually has no idea it exists.
+
+> [!REAL] A company's reception desk
+> Visitors talk to the receptionist, never directly to employees. The receptionist knows who's in, sends you to the right person and turns away troublemakers. Nginx in front of your app servers is that receptionist.
 
 ## Side by side
 

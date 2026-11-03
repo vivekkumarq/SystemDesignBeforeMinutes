@@ -7,6 +7,9 @@ Stop the old version, start the new one.
 - **Cons:** downtime; a bad release hits everyone at once.
 - **Use for:** dev environments, batch jobs, or when two versions genuinely cannot coexist.
 
+> [!REAL] Closing the shop for renovation
+> Shut the shop, renovate, reopen. Simple, but customers are turned away while you work.
+
 ## Rolling deployment
 
 Replace instances a few at a time: take one out of the load balancer, upgrade it, health-check it, put it back, repeat.
@@ -28,6 +31,9 @@ flowchart LR
 - **Pros:** no downtime; no extra capacity needed; the default in Kubernetes.
 - **Cons:** v1 and v2 serve traffic **at the same time**, so they must be compatible; rollback is another slow rolling deploy; a bad release gradually reaches everyone unless health checks catch it.
 
+> [!REAL] Repainting a building one floor at a time
+> Residents move between floors while each floor is painted. There's no downtime, but for a while some floors are old and some are new.
+
 ## Blue-green deployment
 
 Run two complete environments. **Blue** serves all traffic (v1). Deploy v2 to **green**, test it, then switch the router to green in one step. Blue stays ready.
@@ -41,6 +47,9 @@ flowchart LR
 
 - **Pros:** instant switch and **instant rollback** (switch back); you can test green with production config before it gets traffic.
 - **Cons:** double the infrastructure during the release; database changes must work for both versions; in-flight sessions and long connections need draining; the switch moves everyone at once, so a subtle bug affects all users until noticed.
+
+> [!REAL] A second, identical stage
+> A concert has two stages. While band A plays on the blue stage, band B sets up on the green one; the lights switch to green in a second. If something's wrong, switch back.
 
 ## Canary release
 
@@ -58,13 +67,22 @@ flowchart LR
 - **Cons:** more complex routing and monitoring; needs enough traffic for statistically meaningful comparison; both versions run together (compatibility again).
 - Canary by user segment too: employees first, then one region, then everyone.
 
+> [!REAL] The canary in the coal mine
+> Miners carried a canary; if it got sick, they left. Send 1% of users to the new version first; if errors rise, roll back before most people notice. Big apps release to a small percentage of users first in the same way.
+
 ## Related techniques
 
 ### Feature flags
 Deploy code with the new behaviour **switched off**, then enable it for chosen users at runtime. Separates **deploying** from **releasing**: a bad feature is turned off in seconds without a redeploy. Requires discipline to remove old flags.
 
+> [!REAL] A light switch for features
+> The code ships "off" and you flip the switch for 5% of users, then everyone. If it misbehaves, switch it off without a redeploy.
+
 ### Shadow (dark) traffic
 Copy real requests to the new version without returning its responses to users. Compare results and performance with zero user impact. Be careful with side effects (writes, emails, payments).
+
+> [!REAL] A trainee shadowing a senior
+> The trainee handles the same cases as the senior in parallel, but only the senior's decisions count. The new service receives copies of real traffic, and its answers are compared but never shown to users.
 
 ### A/B testing
 Route users to variants to measure **business outcomes** (conversion, engagement), not release safety. Uses the same traffic-splitting machinery as canaries.
@@ -89,6 +107,9 @@ Because old and new versions run at the same time, schema changes are done in st
 5. **Contract:** remove the old column once nothing uses it.
 
 Never rename or drop a column in the same release that stops using it.
+
+> [!REAL] Renaming a road
+> When a road is renamed, the old name stays on signboards alongside the new one for a year before it's removed. Add the new column, write both, migrate readers, then drop the old column.
 
 ### Trunk-based development
 Developers merge small changes into the main branch frequently (at least daily), keeping it always releasable, with unfinished work hidden behind feature flags. Short-lived branches avoid painful merges and make continuous deployment possible. It pairs naturally with canaries and flags.

@@ -8,6 +8,9 @@ Two facts make caches effective:
 
 The key metric is the **hit ratio**: the share of requests answered by the cache. At 95%, the backend sees only 1 in 20 requests.
 
+> [!REAL] The pareto rule of your fridge
+> You use 20% of the items in your kitchen 80% of the time, so those stay on the counter. On Netflix, a small fraction of titles get most of the views, so caching that small set serves most requests.
+
 ## Caching at every layer
 
 ```mermaid
@@ -37,6 +40,9 @@ The fastest request is one never made. HTTP headers tell browsers and CDNs what 
 - `Cache-Control: no-cache` + `ETag` for HTML: the browser revalidates each time, but if nothing changed the server replies `304 Not Modified` with no body.
 - `Cache-Control: private` for user-specific data that a shared CDN must not store.
 
+> [!REAL] Your browser remembering the logo
+> The second time you open Amazon, the logo and scripts load from your browser's own cache, not the internet. That's why the second visit feels faster.
+
 ### In-process vs distributed caches
 
 | | In-process (local memory) | Distributed (Redis, Memcached) |
@@ -49,9 +55,15 @@ The fastest request is one never made. HTTP headers tell browsers and CDNs what 
 
 A common combination is **two-level caching**: a tiny, short-TTL local cache for the hottest keys in front of a shared Redis cluster.
 
+> [!REAL] Your own notebook vs the shared whiteboard
+> In-process cache is your personal notebook: instant, but nobody else sees it and it's gone when you leave. A distributed cache like Redis is the office whiteboard: a few steps away, but everyone sees the same thing.
+
 ### Redis vs Memcached
 - **Memcached:** simple, multi-threaded key-value cache of strings. Great for plain object caching.
 - **Redis:** rich data structures (hashes, lists, sets, sorted sets, streams, HyperLogLog), optional persistence, replication, Lua scripting, pub/sub. Used for caches, leaderboards, rate limiters, queues and locks. The default choice today.
+
+> [!REAL] A Swiss knife vs a kitchen knife
+> Memcached is a sharp kitchen knife: simple key-value caching, very fast. Redis is a Swiss army knife: lists, sorted sets for leaderboards, counters, pub/sub and persistence.
 
 ## What to cache, and what not to
 
@@ -65,6 +77,9 @@ A common combination is **two-level caching**: a tiny, short-TTL local cache for
 - Data that must be exactly current (account balances during a transfer).
 - Huge, rarely reused results (low hit ratio, wasted memory).
 - Highly personalised results with no reuse across requests (unless cached per user and reused).
+
+> [!REAL] Menu card vs bill
+> A restaurant prints the menu once and hands out copies (cacheable: same for everyone, rarely changes). It never photocopies your bill for the next customer (personal, changes every time).
 
 ## The costs of caching
 

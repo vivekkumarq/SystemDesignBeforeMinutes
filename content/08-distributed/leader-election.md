@@ -8,6 +8,9 @@ Many distributed systems need exactly one node to be in charge: one database pri
 
 The danger is **split brain**: two nodes both believe they are the leader and both accept writes, and the data diverges.
 
+> [!REAL] Who's the class monitor?
+> If the monitor is absent, the class must choose one replacement, and two groups mustn't each elect their own. Over a laggy network, "absent" and "just slow to answer" look the same.
+
 ## The key idea: majorities (quorums)
 
 In a cluster of N nodes, a decision needs agreement from a **majority**: more than N/2.
@@ -17,6 +20,9 @@ In a cluster of N nodes, a decision needs agreement from a **majority**: more th
 - During a partition, only the side with a majority can make progress. The minority side stops, which is exactly what prevents split brain (a CP choice in CAP terms).
 
 That's why consensus clusters have an odd number of nodes: 4 nodes tolerate only 1 failure, the same as 3.
+
+> [!REAL] Majority vote in a committee
+> With 5 members, any decision needs 3 votes. Two groups of 3 can't exist at once, so there can never be two winners.
 
 ## Raft in plain language
 
@@ -38,6 +44,9 @@ stateDiagram-v2
 - Each node votes for **at most one candidate per term**, and only for a candidate whose log is at least as up to date as its own.
 - A candidate with votes from a majority becomes leader and starts sending heartbeats.
 - **Randomised timeouts** make it unlikely that two candidates start at the same moment; if they split the vote, both time out and try again with a new term.
+
+> [!REAL] Raising your hand after silence
+> If the teacher hasn't spoken for a random few seconds, a student says "I'll lead, vote for me". The random wait means usually only one student asks first.
 
 ### 2. Log replication
 - Clients send commands to the leader, which appends them to its **log** and sends them to followers.
@@ -86,6 +95,9 @@ Lease expires, Leader B gets token 34 → writes with 34
 A wakes up, writes with 33 → storage rejects (33 < 34)
 ```
 
+> [!REAL] Numbered visitor passes
+> Every new manager gets a higher pass number. If the old manager comes back after a long nap and tries to give orders, the staff see an older number and ignore him.
+
 ## Where you'll meet this
 
 - etcd (Kubernetes' brain), Consul, ZooKeeper: Raft/ZAB-based configuration and coordination.
@@ -95,6 +107,9 @@ A wakes up, writes with 33 → storage rejects (33 < 34)
 
 > [!INTERVIEW] Keep it at the right altitude
 > "Only one scheduler instance may run jobs, so instances compete for a lease in etcd with a 10-second TTL and renew it every 3 seconds. etcd uses Raft across three nodes, so it tolerates one failure and can't elect two leaders. Jobs write with the lease's revision as a fencing token so a paused former leader can't double-run work."
+
+> [!REAL] Real systems
+> Kubernetes stores its state in etcd (Raft). Kafka moved from ZooKeeper to its own Raft-based KRaft. Databases like CockroachDB use Raft for every range of data.
 
 ## Key takeaways
 

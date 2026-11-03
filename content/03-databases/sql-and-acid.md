@@ -14,11 +14,31 @@ COMMIT;
 
 If the server crashes between the two updates, money must not disappear. If two transfers from Asha run at the same time, her balance must not go negative. ACID is how the database makes sure.
 
+> [!REAL] Sending ₹1,000 to a friend
+> Your account must go down by ₹1,000 and your friend's must go up by ₹1,000. If the server crashes in between, either both happen or neither. Money must never disappear or appear from nowhere.
+
+```mermaid
+sequenceDiagram
+  participant App
+  participant DB
+  App->>DB: BEGIN
+  App->>DB: debit you ₹1,000
+  App->>DB: credit friend ₹1,000
+  alt both succeed
+    App->>DB: COMMIT (both saved)
+  else crash or error
+    DB-->>App: ROLLBACK (neither saved)
+  end
+```
+
 ## A: Atomicity
 
 All or nothing. If any statement fails, or the process crashes before `COMMIT`, every change in the transaction is rolled back.
 
 *How:* databases write changes to a **write-ahead log (WAL)** before applying them; on recovery they replay committed transactions and undo uncommitted ones.
+
+> [!REAL] A train ticket with a berth
+> Either you get a confirmed ticket *and* the money is debited, or neither happens. A "debited but no ticket" state is the bug every IRCTC user fears.
 
 ## C: Consistency
 
@@ -26,13 +46,22 @@ The transaction moves the database from one **valid** state to another. Valid me
 
 Note that this "C" is about *integrity rules*, and the database can only enforce the rules you declare. It is a different idea from consistency in CAP, which is about replicas agreeing.
 
+> [!REAL] The rules of the game
+> If a rule says "balance can't go below zero" or "every order belongs to a real customer", a transaction that would break it is rejected. The database is never left in a state the rules forbid.
+
 ## I: Isolation
 
 Concurrent transactions do not see each other's half-finished work; the result is as if they ran in some order. In practice, full isolation (serializability) is expensive, so databases offer **weaker levels** that allow certain anomalies.
 
+> [!REAL] Two people booking the last seat
+> Two people click "Book" on the last seat of a BookMyShow show at the same moment. Isolation makes it as if they went one after the other: one gets the seat, the other sees "sold out".
+
 ## D: Durability
 
 Once `COMMIT` returns, the data survives crashes and power loss. The WAL is flushed to disk (`fsync`) before the commit is acknowledged, and in replicated setups, often copied to another machine too.
+
+> [!REAL] The SMS after payment
+> Once you get "Payment successful", the record survives even if the bank's server loses power a second later. It's already on disk and on a replica.
 
 ## Isolation levels and anomalies
 
@@ -43,6 +72,11 @@ Once `COMMIT` returns, the data survives crashes and power loss. The WAL is flus
 - **Phantom read:** running the same query twice and getting a different *set* of rows because someone inserted or deleted matching rows.
 - **Lost update:** two transactions read a value, both modify it, and the second write silently overwrites the first. (Two people add 1 to a counter of 10; the result is 11, not 12.)
 - **Write skew:** two transactions each read overlapping data, make decisions based on it and write to *different* rows, together breaking a rule. Classic example: two on-call doctors each see "two doctors on call", each removes themselves, and nobody is left.
+
+> [!REAL] Real-life versions
+> - **Dirty read:** you see a friend's "paid" status that is then rolled back.
+> - **Lost update:** two shop clerks both read "10 in stock", each sell one, both write "9". One sale vanished.
+> - **Phantom:** you count today's orders twice in one report and get different totals because new orders arrived in between.
 
 ### The levels
 
@@ -77,6 +111,9 @@ WHERE id = 'A12' AND status = 'FREE' AND version = 7;
 
 > [!INTERVIEW] Name the level you need
 > "For seat booking I'll use a conditional update on the seat row (optimistic concurrency) plus a unique constraint on show and seat, so even concurrent requests cannot double book. Read committed is enough because the conditional update does the check and write atomically."
+
+> [!REAL] The Google Docs "someone else edited this" warning
+> Optimistic locking works like an editor warning "this document changed since you opened it". The update says `WHERE version = 7`; if someone else already moved it to version 8, your update fails and you retry with fresh data.
 
 ## Transactions across services
 

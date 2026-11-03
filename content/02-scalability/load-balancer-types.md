@@ -4,6 +4,16 @@
 
 The layers come from the OSI model. Layer 4 is transport (TCP/UDP); layer 7 is application (HTTP, gRPC).
 
+```mermaid
+flowchart LR
+  C[Client] --> L4[L4 balancer<br/>sees IP + port only]
+  L4 --> S1[Server 1]
+  L4 --> S2[Server 2]
+  C2[Client] --> L7[L7 balancer<br/>reads URL, headers]
+  L7 -- /api/pay --> P[Payment servers]
+  L7 -- /img --> I[Image servers]
+```
+
 ### Layer 4 (transport) load balancers
 They see IP addresses and ports, and forward packets or connections without reading the content.
 
@@ -11,6 +21,9 @@ They see IP addresses and ports, and forward packets or connections without read
 - Work with **any TCP/UDP protocol**: databases, game servers, MQTT, custom protocols.
 - **Cannot** route by URL, header or cookie, because they never parse HTTP.
 - Usually cannot terminate TLS (they pass encrypted bytes through).
+
+> [!REAL] The postman
+> The postman reads only the address on the envelope and delivers it. He never opens the letter. That's a layer-4 balancer: fast, but blind to the content.
 
 ### Layer 7 (application) load balancers
 They terminate the connection, parse the HTTP request and then decide where to send it.
@@ -32,6 +45,9 @@ They terminate the connection, parse the HTTP request and then decide where to s
 > [!TIP] They are often stacked
 > Large sites commonly put a fleet of L4 balancers at the edge (fast, simple, handles enormous connection counts) in front of a fleet of L7 proxies (smart routing). Each layer does what it is best at.
 
+> [!REAL] The office mail room
+> The mail room opens each envelope, reads "Attn: Accounts" and sends it to the right department. A layer-7 balancer reads the URL: `/api/payments` goes to payment servers, `/images` goes to the image servers.
+
 ## Where the load balancing happens
 
 ### DNS load balancing
@@ -39,19 +55,34 @@ DNS returns different IP addresses for the same name, either rotating them (roun
 - Cheap, global, no extra hop.
 - Crude: clients and resolvers cache answers for the TTL, so a dead server can keep receiving traffic until caches expire. No real health awareness unless the DNS provider adds it.
 
+> [!REAL] Directory enquiry
+> Calling directory enquiry for "Domino's" gets you a different branch number depending on where you call from. DNS hands different users different IPs, but phones cache the number, so changes take time to spread.
+
 ### Global server load balancing (GSLB)
 Steers users to the best **region or data centre**, using health, latency and geography, typically through DNS or anycast. If a whole region fails, traffic moves to another. See [DNS Resolution, Caching & Routing](#/l/06-networking/dns-performance).
 
+> [!REAL] Choosing the nearest airport
+> A traveller from Chennai flies out of Chennai, not Delhi, unless Chennai airport is closed. GSLB sends Indian users to the Mumbai region and fails them over to Singapore if Mumbai goes down.
+
 ### Anycast
 The same IP address is announced from many locations; internet routing delivers each user to the nearest one. Used by CDNs and DNS providers. Fast failover and natural DDoS absorption.
+
+> [!REAL] One emergency number, many control rooms
+> Dial 112 anywhere in India and the call goes to the nearest control room, though everyone dials the same number. Cloudflare's 1.1.1.1 works the same way: one IP, served from hundreds of cities.
 
 ### Client-side load balancing
 The client itself (or a library inside it) knows the list of servers, often from a service registry, and picks one. Common inside microservice fleets (gRPC clients, service meshes).
 - No extra network hop, no central bottleneck.
 - Every client needs the logic and a fresh server list.
 
+> [!REAL] Choosing your own checkout queue
+> Instead of a staff member directing you, you look at the queues and pick one yourself. Inside microservices, the calling service picks a healthy instance from a list it keeps up to date.
+
 ### Service mesh sidecars
 A proxy runs next to every service instance and handles load balancing, retries, timeouts and mTLS for it. Moves the logic out of application code into infrastructure.
+
+> [!REAL] A personal assistant for every employee
+> Each employee gets an assistant who handles their calls, retries, scheduling and ID checks, so the employee only does real work. Istio and Linkerd put such a proxy next to every service.
 
 ## Hardware vs software vs managed
 

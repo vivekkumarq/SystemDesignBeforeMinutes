@@ -8,6 +8,9 @@ Consumers with the same `group.id` split a topic's partitions between them; each
 - Scaling a group beyond the number of partitions leaves extra consumers idle.
 - Changing a group ID means starting from scratch (see `auto.offset.reset`).
 
+> [!REAL] Team name on the attendance sheet
+> Consumers with the same `group.id` are one team splitting the work. A new `group.id` is a brand-new team that reads everything from scratch.
+
 ## 2. `enable.auto.commit` (+ `auto.commit.interval.ms`): when progress is saved
 
 - `true` (default): offsets of polled records are committed periodically in the background (every 5 s by default). Convenient, but commits are not tied to processing: a crash can skip unprocessed messages or replay processed ones.
@@ -26,6 +29,9 @@ while (running) {
 
 For anything important, disable auto-commit and commit after processing.
 
+> [!REAL] Bookmarking a book
+> Auto-commit is your e-reader saving your page every 5 seconds, even if you didn't actually read the page. Commit manually after you finish processing, so a crash never skips a page.
+
 ## 3. `auto.offset.reset`: where to start with no saved offset
 
 Applies when a group has no committed offset (new group) or the saved one has expired or been deleted.
@@ -36,12 +42,18 @@ Applies when a group has no committed offset (new group) or the saved one has ex
 
 A new service that must build its state from history (e.g. a new search indexer) needs `earliest`. Also remember that group offsets themselves expire after a period of inactivity (`offsets.retention.minutes` on the broker), which can silently trigger this reset.
 
+> [!REAL] Joining a WhatsApp group
+> `latest` is joining a group and only seeing new messages. `earliest` is scrolling up and reading the whole history first.
+
 ## 4. `max.poll.records` and `max.poll.interval.ms`: batch size vs liveness
 
 - `max.poll.records` (default 500): the most records returned by one `poll()`.
 - `max.poll.interval.ms` (default 5 minutes): the longest allowed gap between `poll()` calls. Exceed it and the consumer is considered stuck, removed from the group and its partitions are reassigned, triggering a **rebalance**. Its uncommitted work will be processed again by someone else.
 
 If processing a batch is slow (calls to external APIs, heavy computation), either lower `max.poll.records` or raise `max.poll.interval.ms`, or hand records to a worker pool while pausing the partitions. A classic production incident is a consumer that takes 6 minutes per batch, gets kicked out, rejoins, gets the same batch, and loops forever.
+
+> [!REAL] Taking too many plates
+> If a waiter carries 50 plates and takes too long, the manager assumes he left and gives his tables to someone else. Smaller batches keep you inside the time limit.
 
 ## 5. `session.timeout.ms` and `heartbeat.interval.ms`: failure detection
 

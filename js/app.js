@@ -23,6 +23,8 @@
   const saveDone = () => { store.set('sd.done', [...done]); paintProgress(); };
   const chDone = (ch) => ch.lessons.filter((l) => done.has(l.id)).length;
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+  const PAL = [0, 1, 2, 3, 5, 6, 4, 7].map((n) => `var(--p${n})`);
+  const cc = (i) => PAL[i % PAL.length];
 
   // ---------- Theme & text size ----------
   const root = document.documentElement;
@@ -44,7 +46,7 @@
     let html = '', part = '';
     COURSE.forEach((ch, i) => {
       if (ch.part !== part) { part = ch.part; html += `<div class="nav-part">${esc(part)}</div>`; }
-      html += `<div class="nav-ch${openChapters.has(ch.slug) ? ' open' : ''}" data-ch="${ch.slug}">
+      html += `<div class="nav-ch${openChapters.has(ch.slug) ? ' open' : ''}" data-ch="${ch.slug}" style="--cc:${cc(i)}">
         <button type="button" aria-expanded="${openChapters.has(ch.slug)}"><span class="ch-icon">${ch.icon}</span><span class="ch-name">${i + 1}. ${esc(ch.title)}</span><span class="ch-count" data-count="${ch.slug}"></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
         <ul>${ch.lessons.map((l) => `<li><a href="#/l/${l.id}" data-id="${l.id}"><span class="dot"></span><span>${esc(l.title)}</span></a></li>`).join('')}</ul>
       </div>`;
@@ -119,14 +121,15 @@
     // GitHub-style callouts: > [!TIP] Title
     $$('blockquote', el).forEach((bq) => {
       const p = bq.firstElementChild;
-      const m = p && p.innerHTML.match(/^\[!(NOTE|TIP|WARNING|INTERVIEW|EXAMPLE)\]\s*(.*?)(<br>|\n|$)/i);
+      const m = p && p.innerHTML.match(/^\[!(NOTE|TIP|WARNING|INTERVIEW|EXAMPLE|REAL)\]\s*(.*?)(<br>|\n|$)/i);
       if (!m) return;
       const type = m[1].toLowerCase();
       p.innerHTML = p.innerHTML.slice(m[0].length);
       if (!p.textContent.trim()) p.remove();
       const box = document.createElement('div');
       box.className = `callout ${type}`;
-      box.innerHTML = `<div class="callout-title">${{ note: 'Note', tip: 'Tip', warning: 'Watch out', interview: 'Interview angle', example: 'Example' }[type]}${m[2] ? ' · ' + m[2] : ''}</div>`;
+      const [ic, label] = { note: ['ℹ️', 'Note'], tip: ['💡', 'Tip'], warning: ['⚠️', 'Watch out'], interview: ['🎯', 'Interview angle'], example: ['🧪', 'Example'], real: ['🌍', 'Real life'] }[type];
+      box.innerHTML = `<div class="callout-title"><i aria-hidden="true">${ic}</i>${label}${m[2] ? ' · ' + m[2] : ''}</div>`;
       box.append(...bq.childNodes);
       bq.replaceWith(box);
     });
@@ -170,6 +173,16 @@
     });
     // Heading anchors
     $$('h2, h3', el).forEach((h) => { h.id = slugify(h.textContent); });
+    $$(':scope > h2', el).forEach((h, k) => h.style.setProperty('--sc', cc(k)));
+    // Terms: each h3 plus its content becomes a coloured card, so every term stands out.
+    $$(':scope > h3', el).forEach((h, k) => {
+      const card = document.createElement('section');
+      card.className = 'term';
+      card.style.setProperty('--tc', cc(k + 1));
+      h.before(card);
+      let n = h;
+      while (n && !(n !== h && /^(H2|H3|HR)$/.test(n.tagName))) { const nx = n.nextElementSibling; card.append(n); n = nx; }
+    });
   }
 
   // ---------- Views ----------
@@ -179,10 +192,10 @@
   function home() {
     const last = byId.get(store.get('sd.last', ''));
     const next = last || LESSONS.find((l) => !done.has(l.id)) || LESSONS[0];
-    let html = `<section class="hero">
-      <span class="eyebrow">Complete course · ${COURSE.length} chapters</span>
+    let html = `<section class="hero"><i class="orb a"></i><i class="orb b"></i><i class="orb c"></i>
+      <span class="eyebrow">✦ Complete course · ${COURSE.length} chapters</span>
       <h1>System design, <span>explained</span> the way you'd explain it in an interview.</h1>
-      <p>From latency numbers to a full payment system. Every idea is in plain language, with diagrams, trade-offs, interview angles and a quiz at the end of each chapter.</p>
+      <p>From latency numbers to a full payment system. Every idea is in plain language, with real-life examples, animated diagrams, trade-offs, interview angles and a quiz at the end of each chapter.</p>
       <div class="hero-actions">
         <a class="btn primary" href="#/l/${next.id}">${last ? 'Continue: ' + esc(next.title) : done.size ? 'Pick up where you left off' : 'Start the course'} ${icon.arrow}</a>
         <a class="btn" href="#/c/17-revision">Interview tomorrow? Revise</a>
@@ -193,7 +206,9 @@
         <div class="stat"><b>${done.size}</b><small>done so far</small></div>
         <div class="stat"><b>${pct(done.size, LESSONS.length)}%</b><small>complete</small></div>
       </div>
-    </section>`;
+    </section>
+    <div class="features">${[['🌍', 'Real-life examples', 'Every idea tied to apps you use: Swiggy, UPI, Netflix, WhatsApp.', 1], ['🔀', 'Animated diagrams', 'Watch requests flow through each architecture.', 2], ['🎯', 'Interview angles', 'What to say, and the traps interviewers set.', 4], ['🧠', 'Quizzes & flashcards', 'Check yourself at the end of every chapter.', 5]]
+      .map(([i, b, t, c]) => `<div class="feature" style="--cc:${cc(c)}"><i>${i}</i><div><b>${b}</b><small>${t}</small></div></div>`).join('')}</div>`;
     let part = '';
     COURSE.forEach((ch, i) => {
       if (ch.part !== part) {
@@ -203,7 +218,7 @@
         html += `<div class="part-head"><h2>${esc(part)}</h2><span>${chs.reduce((n, c) => n + c.lessons.length, 0)} lessons</span></div><div class="cards">`;
       }
       const d = chDone(ch), p = pct(d, ch.lessons.length);
-      html += `<a class="card" href="#/c/${ch.slug}">
+      html += `<a class="card" href="#/c/${ch.slug}" style="--cc:${cc(i)}">
         <div class="card-top"><span class="ch-icon">${ch.icon}</span><span class="num">Chapter ${String(i + 1).padStart(2, '0')}</span></div>
         <h3>${esc(ch.title)}</h3><p>${esc(ch.blurb)}</p>
         <div class="bar"><i style="width:${p}%"></i></div>
@@ -220,10 +235,10 @@
     const i = COURSE.indexOf(ch), d = chDone(ch);
     const next = ch.lessons.find((l) => !done.has(l.id)) || ch.lessons[0];
     view.innerHTML = `<div class="crumbs"><a href="#/">Home</a><span>/</span><span>${esc(ch.part)}</span></div>
-      <section class="ch-hero"><span class="tag">Chapter ${i + 1} · ${ch.lessons.length} lessons</span><h1>${ch.icon} ${esc(ch.title)}</h1><p>${esc(ch.blurb)}</p>
+      <section class="ch-hero" style="--cc:${cc(i)}" data-icon="${ch.icon}"><span class="tag">Chapter ${i + 1} · ${ch.lessons.length} lessons</span><h1><span class="ic">${ch.icon}</span> ${esc(ch.title)}</h1><p>${esc(ch.blurb)}</p>
       <div class="bar" style="max-width:360px;margin-bottom:16px"><i style="width:${pct(d, ch.lessons.length)}%"></i></div>
       <a class="btn primary" href="#/l/${next.id}">${d ? 'Continue' : 'Start chapter'} ${icon.arrow}</a></section>
-      <ol class="lesson-list">${ch.lessons.map((l, k) => `<li><a href="#/l/${l.id}"><span class="dot${done.has(l.id) ? ' done' : ''}"></span><span class="idx">${String(k + 1).padStart(2, '0')}</span><span class="t">${esc(l.title)}</span><span class="tag ${l.kind}">${KIND_LABEL[l.kind]}</span></a></li>`).join('')}</ol>`;
+      <ol class="lesson-list" style="--cc:${cc(i)}">${ch.lessons.map((l, k) => `<li><a href="#/l/${l.id}"><span class="dot${done.has(l.id) ? ' done' : ''}"></span><span class="idx">${String(k + 1).padStart(2, '0')}</span><span class="t">${esc(l.title)}</span><span class="tag ${l.kind}">${KIND_LABEL[l.kind]}</span></a></li>`).join('')}</ol>`;
     document.title = `${ch.title} — SystemDesignBeforeMinutes`;
     markActive(null);
     toggleChapter(slug, true);
@@ -237,9 +252,8 @@
     const prev = LESSONS[l.n - 1], next = LESSONS[l.n + 1];
     document.title = `${l.title} — SystemDesignBeforeMinutes`;
     markActive(id);
-    view.innerHTML = `<div class="lesson-wrap"><article>
-      <div class="crumbs"><a href="#/">Home</a><span>/</span><a href="#/c/${l.ch.slug}">${l.ci + 1}. ${esc(l.ch.title)}</a></div>
-      <header class="lesson-head"><h1>${esc(l.title)}</h1><div class="meta" id="meta"><span class="tag ${l.kind}">${KIND_LABEL[l.kind]}</span><span>Lesson ${l.li + 1} of ${l.ch.lessons.length}</span></div></header>
+    view.innerHTML = `<div class="lesson-wrap" style="--cc:${cc(l.ci)}"><article>
+      <header class="lesson-head" data-icon="${l.ch.icon}"><div class="crumbs"><a href="#/">Home</a><span>/</span><a href="#/c/${l.ch.slug}">${l.ci + 1}. ${esc(l.ch.title)}</a></div><h1>${esc(l.title)}</h1><div class="meta" id="meta"><span class="tag ${l.kind}">${KIND_LABEL[l.kind]}</span><span>Lesson ${l.li + 1} of ${l.ch.lessons.length}</span></div></header>
       <div class="prose" id="prose"><div class="skeleton" style="width:90%"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>
       <div class="complete-box"><p>${done.has(id) ? 'You have finished this lesson.' : 'Finished reading? Mark it to track your progress.'}</p>
         <button type="button" class="btn ${done.has(id) ? 'done' : 'primary'}" id="markDone">${done.has(id) ? icon.check + ' Completed' : 'Mark as complete'}</button></div>

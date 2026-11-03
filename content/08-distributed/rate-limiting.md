@@ -17,12 +17,18 @@ flowchart LR
 - **Memory:** two numbers per client (tokens, last refill time). Refill lazily on each request: `tokens = min(B, tokens + (now − last) × R)`.
 - **Used by:** most API gateways and cloud APIs. The usual default.
 
+> [!REAL] A metro card topped up every minute
+> You get 10 rides' worth of tokens every minute, up to a maximum of 20 saved. You can make a short burst of trips, but not unlimited trips. Stripe and AWS APIs use token-bucket-style limits.
+
 ## 2. Leaky bucket
 
 Requests enter a queue (the bucket) and are processed at a **constant rate**, like water leaking from a hole. If the queue is full, new requests are dropped.
 
 - **Smooths** bursty input into a steady output; great for protecting a downstream system that needs an even pace (e.g. a payment provider's API).
 - Bursts are delayed rather than served immediately, which adds latency; a burst of old requests can block newer ones.
+
+> [!REAL] A funnel
+> However fast you pour water into a funnel, it drips out at a steady rate; if you pour too fast, it overflows. Output is smooth, whatever the input.
 
 ## 3. Fixed window counter
 
@@ -35,6 +41,9 @@ key = "rl:user42:2026-11-02T10:15"   INCR, EXPIRE 60
 - **Simple and cheap** (one counter per client per window).
 - **Boundary problem:** a client can send the full limit at 10:15:59 and again at 10:16:00, which is double the rate across a two-second span.
 
+> [!REAL] "Max 5 OTPs per hour"
+> Simple: count requests from 10:00 to 10:59. The flaw: 5 at 10:59 and 5 more at 11:00 means 10 in two minutes.
+
 ## 4. Sliding window log
 
 Store the timestamp of every request; count those in the last N seconds.
@@ -42,6 +51,9 @@ Store the timestamp of every request; count those in the last N seconds.
 - **Exact**, with no boundary problem.
 - **Memory-heavy:** one entry per request. In Redis, a sorted set per client (`ZADD`, `ZREMRANGEBYSCORE`, `ZCARD`).
 - Good for low limits where accuracy matters (e.g. 5 login attempts per 15 minutes).
+
+> [!REAL] A diary of every visit
+> Keep the timestamp of every request and count those in the last 60 minutes. Precise, but it needs a lot of memory for busy users.
 
 ## 5. Sliding window counter
 
@@ -70,6 +82,9 @@ estimate = 30 + 80 × 0.75 = 90 → allowed
 ## Distributed rate limiting
 
 With many API servers, counters must be shared or carefully partitioned.
+
+> [!REAL] One quota, many doors
+> A mall with 10 entrances and a capacity of 5,000 needs one shared counter, not 10 separate ones. Redis is usually that shared counter.
 
 ### Central store (Redis)
 All servers update counters in Redis. To avoid race conditions between "read count" and "increment", make it atomic: `INCR` with `EXPIRE`, or a **Lua script** that implements the whole token-bucket check in one step.

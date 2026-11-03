@@ -33,6 +33,9 @@ A good shard key:
 
 Bad keys: `country` (India dwarfs others), `created_date` (all new writes hit one shard), a boolean or status column.
 
+> [!REAL] Sorting a school's students into sections
+> Sort by first letter of name and the "S" section overflows (lots of Shreyas and Snehas). Sort by roll number modulo 4 and sections are even. A shard key must spread data and traffic evenly.
+
 ## Sharding strategies
 
 ### Range-based
@@ -40,18 +43,30 @@ Each shard owns a contiguous key range (A–F, G–M…, or IDs 1–1M, 1M–2M�
 - **Pros:** range queries are efficient; easy to understand.
 - **Cons:** **hot spots**. Time-ordered or sequential keys send all new writes to the last shard.
 
+> [!REAL] Dictionary volumes A–D, E–H…
+> Great for "all words starting with Ca" (range queries), but volume S is fat while X is thin. Time-range sharding has the same problem: today's shard takes all the writes.
+
 ### Hash-based
 `shard = hash(key) mod N`.
 - **Pros:** spreads keys evenly.
 - **Cons:** range queries must hit every shard; **changing N moves almost every key**. Consistent hashing fixes the resharding problem. See [From Modulo to Consistent Hashing](#/l/03-databases/consistent-hashing).
+
+> [!REAL] Lockers numbered by a formula
+> Each customer goes to locker `hash(id) % 8`. Even spread, but "all customers who joined in March" means opening every locker.
 
 ### Directory-based (lookup table)
 A lookup service maps each key (or key range) to a shard.
 - **Pros:** total flexibility; move individual tenants or users between shards.
 - **Cons:** the directory is an extra hop and a critical dependency; it must be cached and highly available.
 
+> [!REAL] The building's resident register
+> A register at the gate says which flat each person lives in. Flexible (you can move someone), but the register is now something you must keep available and fast.
+
 ### Geographic
 Shard by region (EU users in an EU shard). Good for latency and data-residency laws; uneven if regions differ in size.
+
+> [!REAL] Regional offices
+> Indian customers' data lives in Mumbai, European customers' in Frankfurt. Faster for users and it helps with data-residency laws like GDPR.
 
 ## The hard problems sharding creates
 
@@ -67,11 +82,17 @@ Even with hashing, one key can be enormously popular: a celebrity's posts, a vir
 - Cache hot keys aggressively.
 - Move a huge tenant to a dedicated shard (directory-based sharding makes this easy).
 
+> [!REAL] Virat Kohli's posts
+> When Virat Kohli posts on Instagram, millions of likes hit one post, and so one shard. Instagram-style systems give celebrity data special treatment: extra caching, splitting counters across many keys, or a separate path.
+
 ### 4. Resharding
 When shards fill up, data must move while the system keeps running:
 - Use **many logical shards** mapped onto fewer physical machines (e.g. 1,024 logical shards on 16 servers). Growing means moving whole logical shards to new servers, never re-hashing keys.
 - Use consistent hashing so adding a node moves only a fraction of keys.
 - Migrate online: copy data, replay changes (double-write or change data capture), verify, then switch reads and writes.
+
+> [!REAL] Moving house with the family still living in it
+> Moving data to new shards while the app keeps serving is like shifting house while still cooking dinner. Plan the shard key so you rarely have to.
 
 ### 5. Unique IDs
 Auto-increment no longer works across shards. Use UUIDs, or time-ordered IDs such as Snowflake-style 64-bit IDs (timestamp + machine ID + sequence), which also keep B-tree inserts efficient.
